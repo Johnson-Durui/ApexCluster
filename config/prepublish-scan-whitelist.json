@@ -1,0 +1,476 @@
+[
+  {
+    "path": "docker/sandbox/Dockerfile",
+    "rule": "identifier.sha256",
+    "lineSha256": "2ca95bee51917c3cf2e6191924ed1ec79de1fa8f3a4c29e21b749af2eadc9ebb",
+    "reason": "Public dependency image digest pin or its exact test fixture."
+  },
+  {
+    "path": "scripts/chat-grok-network-preflight.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "dceacee87243f238ed8157c645a0ea783871812a99b7310f35e38a64ffd1695e",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "scripts/chat-live-grok-approval-probe.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "a6ac98a169360dc1dbc3ec610d11c273703f0e8fa0b28d7461f78906cef2d05e",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "scripts/chat-live-grok-hook-paired-probe.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "14b42f7dd22192042c97f0bfd86a08fdbbeb42f00eed0fc2679d9acd00504fa3",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "scripts/chat-live-grok-hook-paired-probe.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "56d98af8e84861097dffd9afa47df1adb77ef655665a62f12caa3b68a949b97c",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "scripts/chat-live-grok-hook-paired-probe.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "4a3380ee5c82ccac03bc204670d39bca8a4db13b03b88354da27a1e2dafb5ec5",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "scripts/chat-live-grok-hook-paired-probe.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "9c8179c6caa9497c252c4a93ccc24b9b372d732ba2cddc21f739125056ee73e8",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "scripts/chat-live-grok-hook-paired-probe.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "a6f45b66851984c8c05941c212ff2e68e90ae446f9d0721019083cd567283ff5",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "scripts/chat-live-grok-hook-paired-probe.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "7bd646a2309e6499e8591464e1aa9e4b52d1f03bda342ef62fee720eee9b3aa9",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "scripts/chat-live-grok-hook-paired-probe.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "2ae7131ad7ce02174b3e84599c41ed326a570bf87485e8d96d4aca9e2f5e82c6",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "scripts/chat-live-grok-hook-paired-probe.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "a4144332d7138629f6ff208d3abe01a4ada4e324be0d10d0f267f4b339a343be",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "scripts/chat-live-grok-hook-paired-probe.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "7facd5bc06d0d21ec86c91e120199eccaa67dab8112cff1eb94ff4669db8f180",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "scripts/chat-live-grok-hook-paired-probe.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "90fd0e9cce51f85127756ddacbd1e80b0ef5f1b8df6732ced32819e3ff762965",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "scripts/chat-live-grok-hook-paired-probe.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "1ab62012d4ea31c7847b5232ef3636a28960455d381fcce2b1344e16e9498cf2",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "scripts/chat-live-grok-hook-paired-probe.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "b76e6d94418ecf940ec702c5b0b8144f340a07822869eff6baccb8317b7f2073",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "scripts/chat-live-grok-host-probe.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "5673df87badf740ec64087614c6d3ae67820d9c2f90a3b460141a2b436be1253",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "scripts/chat-live-grok-native-probe.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "14b42f7dd22192042c97f0bfd86a08fdbbeb42f00eed0fc2679d9acd00504fa3",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "scripts/chat-live-grok-native-probe.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "34bbadc429be52f0dfe0f34a92a98da618a8019263863863d7fc23867833ffdf",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "scripts/chat-live-grok-native-probe.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "58b348c2915a48a5ed2d0caa11eb7182d9782b41fbc7453bacc70fe3fc4a9115",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "scripts/chat-live-grok-native-probe.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "c571b62d4447d4d699d1d5608cb76cd5357bafe1931fac57642d93ae270464c3",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "scripts/chat-live-grok-native-probe.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "e41c170688d9192b7d23ff9f413780d27161bb2dda70c01112b0afd424a61851",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "scripts/chat-live-grok-native-probe.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "b4771c71994d0847cac3071393baf67917597a0f3a060599c365e19e9792328f",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "scripts/chat-live-grok-native-probe.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "39ef9c06c41c296bdeeb4a30b467cdfd0dc93a78fdf51a48f0ba73e81bb6dd7a",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "scripts/chat-live-grok-probe.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "6a0df4f58dc10ae989511ebd237a07c2f201a2ca4124836177882c1a36aea116",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "scripts/chat-live-grok-probe.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "b6ea5feb19d30961fa2b72d971ce196f995c1d77f62c1113d664fbfd6089286b",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "services/document-worker/build-record.json",
+    "rule": "identifier.sha256",
+    "lineSha256": "1375fb7f7dde987ea1d04fe816e2d8d20f10e7ac3abedf212b7eac326001b95c",
+    "reason": "Public dependency image digest pin or its exact test fixture."
+  },
+  {
+    "path": "services/document-worker/Dockerfile",
+    "rule": "identifier.sha256",
+    "lineSha256": "838371f7f1dd516600107e9ab06dbab7c196c26d5988eceb7a11843dccdb779d",
+    "reason": "Public dependency image digest pin or its exact test fixture."
+  },
+  {
+    "path": "services/document-worker/README.md",
+    "rule": "identifier.sha256",
+    "lineSha256": "4985fc3bfefe39883b88fc9ce0279daad651afb2a43dca34c72835a560a82a33",
+    "reason": "Public dependency image digest pin or its exact test fixture."
+  },
+  {
+    "path": "src/adapters/cursor-writer-runtime.mjs",
+    "rule": "local.posix-user-path",
+    "lineSha256": "7b4b356d0c0d867b93aebfbd3ebdb9a3c8cc358a5d6b83f1f832b56f1904c980",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "src/adapters/cursor-writer-runtime.mjs",
+    "rule": "local.posix-user-path",
+    "lineSha256": "1fe9406d830e0aab0b5a8f7650cf095659c09e8502184c0872b40059e8d15631",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "src/adapters/cursor-writer-runtime.mjs",
+    "rule": "local.posix-user-path",
+    "lineSha256": "c65b57d2ffe3fc999f4f81c7c654c186c655a746bde78f16cac6a13d9523ca80",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "src/adapters/cursor-writer-runtime.mjs",
+    "rule": "local.posix-user-path",
+    "lineSha256": "fde110cf5b922130aab1057f33a93b607891a18ba16f0d94f6bfb4f3092fc21c",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "src/adapters/cursor-writer-runtime.mjs",
+    "rule": "local.posix-user-path",
+    "lineSha256": "509bdf0c1876281f5ca632cd89d170c3d597395b1d5fbe624bcdaea4fb11ea3a",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "src/adapters/cursor-writer-runtime.mjs",
+    "rule": "local.posix-user-path",
+    "lineSha256": "ca8286980b8e57a76be1281d28272791a9222566ec8bf566080f2f2d4ae73446",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "src/adapters/cursor-writer.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "4219627c82b275285ca06dfe6bf48433b98352777df1741161263920fd082393",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "src/adapters/cursor-writer.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "1fe9406d830e0aab0b5a8f7650cf095659c09e8502184c0872b40059e8d15631",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "src/chat/cursor-deny-bridge.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "dafd4df77d81b2249c533c8995aef6e646d2c2c8d9e7ea415da370ac4e502564",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "src/chat/cursor-deny-bridge.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "eafbd6319a62d511fac91779d9d16bbd77dddb0e0bcab275754b111c3e372c55",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "src/chat/cursor-deny-bridge.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "10ee91557d77e98a23a6e69807c3a70646f9d863a48b8850d599e4a1b43e9c16",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "src/chat/cursor-deny-bridge.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "01f87aea747466bc471385f7a28a49891827c4bc7c28cd41b9e76dd52ec9cfa4",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "src/chat/cursor-native-tool-exclusion.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "4c90e33c8ea2e30a749ca09977636166261168c7905ca5986ed3a623a4ccfc32",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "src/chat/cursor-readonly-runtime.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "47817d2642dab013a190300ddb98549af7dbb9f4e4ecef0d2d39924eca415bc5",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "src/chat/cursor-readonly-runtime.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "c3af40af21bacef43acf30e852e84acb11268168a8e6221a98a87e4ec6173c42",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "src/chat/cursor-readonly-runtime.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "be8314306dae8239f8113400ab6b763b22aaa344a203ebaf51c44f9c37a32a35",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "src/chat/cursor-readonly-runtime.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "d8fc072035666e05d8224e408e2095325bae9c66d066f7de9ff700d4b467903f",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "src/chat/cursor-readonly-runtime.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "e7c9eae6553b2a0d7c752164bfc0f7fbd711da323be2072527a29aa30887a7bd",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "src/chat/cursor-readonly-runtime.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "b2d4618e324d353afd3a575b5b1b2d079425e4a79900d44d2d1a64e0e4d4a73f",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "src/chat/wsl-test-runtime.mjs",
+    "rule": "local.posix-user-path",
+    "lineSha256": "b13f8581c9aed139fc7f9b53dc754c40201ce65276a2ffb9d17cacceb644ea2f",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "src/chat/wsl-test-runtime.mjs",
+    "rule": "local.posix-user-path",
+    "lineSha256": "6995d26ff602c78159cf83eea4e2d8967f3bcfad0e77070cb40e98f7684a3f05",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "src/pipeline/git-checkpoint.ts",
+    "rule": "personal.email",
+    "lineSha256": "413e9cdd5c91426d8f208a035fec46df18056edc344ab0d506c297f0dfb951f4",
+    "reason": "RFC-reserved invalid-domain Git or redaction test fixture."
+  },
+  {
+    "path": "src/pipeline/git-checkpoint.ts",
+    "rule": "personal.email",
+    "lineSha256": "c54f68c3a2d3251d1cdf73a7047a54f32dd0373d5bf68d1d44a9b05c069644d9",
+    "reason": "RFC-reserved invalid-domain Git or redaction test fixture."
+  },
+  {
+    "path": "tests/adapters.test.ts",
+    "rule": "secret.api-key",
+    "lineSha256": "082106738d6211ab10296dfd24c5d0396858d81de3e445a9636b25e964f31b22",
+    "reason": "Synthetic leak-prevention canary used only by a test."
+  },
+  {
+    "path": "tests/chat-extensions-docker.test.ts",
+    "rule": "identifier.sha256",
+    "lineSha256": "2c56613881d3515cc260b57e62638bf706b31dce6512941a13ed3567284f9422",
+    "reason": "Public dependency image digest pin or its exact test fixture."
+  },
+  {
+    "path": "tests/chat-grok-network-preflight.test.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "fdb5bd0a6adbac67ea28819073855c83f81d3edf66a93dd7b1812c5d9fc465eb",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "tests/chat-runner-wsl.test.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "80f895fef45a80d517b4c1c006255fb7500e78fe3cbb9319e9705edc1ca22e31",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "tests/cursor-adapter.test.ts",
+    "rule": "personal.email",
+    "lineSha256": "f2e9d54a50a24f2ca01167d998a9a61f6bb40583387f75649333363b36fd3e0f",
+    "reason": "RFC-reserved invalid-domain Git or redaction test fixture."
+  },
+  {
+    "path": "tests/cursor-isolated.test.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "04857b9452fb67a13d60351f370f8b5de378c2f5842c6c55cc74eac5ceaf471e",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "tests/cursor-isolated.test.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "ce929d4a728485de988e9b555201d059a8a0fa2ba6dd0cad15de2e93043eed2e",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "tests/cursor-isolated.test.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "9ee8e248a4471966e0f2fd092625ad64072866dd5a2da6abadce7d2642519021",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "tests/cursor-isolated.test.ts",
+    "rule": "personal.email",
+    "lineSha256": "99814cd8d9d491e316747c0694a169a9cb5b130836f692d62bc20357b63cd898",
+    "reason": "RFC-reserved invalid-domain Git or redaction test fixture."
+  },
+  {
+    "path": "tests/cursor-isolated.test.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "b1cecc9eea35cd1e044b30cadd935b315717a855b316378783024eb5fdd38428",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "tests/cursor-isolated.test.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "5673df87badf740ec64087614c6d3ae67820d9c2f90a3b460141a2b436be1253",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "tests/cursor-isolated.test.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "40d667c59f30573b311e2869b4ca48c1588fc16e5ec1db257d1db694c7188fce",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "tests/cursor-isolated.test.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "ba97a74abe7d694fe17b4ffd4e199bee91c673825837e2dabd6f81335e8afdc1",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "tests/cursor-isolated.test.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "7f71b825313648c4c860c582e925a3b8fe66e09a719f3157df4bfaad4642295a",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "tests/cursor-isolated.test.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "3282a34775041d198ac5104d03257e69b062f0ef57bc44fe3e2a054d1291b758",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "tests/cursor-isolated.test.ts",
+    "rule": "personal.email",
+    "lineSha256": "0f21080e86b9764a6fbc7950f1e15652dd5ad070ce228aef41454cecaf35e790",
+    "reason": "RFC-reserved invalid-domain Git or redaction test fixture."
+  },
+  {
+    "path": "tests/cursor-isolated.test.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "e03c65f3ca4e70a0ec699ca6164ab85913b1f459998da6bd6e7e7d98e0a707f9",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "tests/cursor-isolated.test.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "46d79351d1394639b4533bd5a9b4f5f2639a8fc0b34d9177417d97a4d95a063e",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "tests/cursor-isolated.test.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "07f490da6e374c640be8375228a8ae8571b2be8ab7543bdad7833e29ea1e36e5",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "tests/cursor-writer.test.ts",
+    "rule": "personal.email",
+    "lineSha256": "43f2a7b370e59dfda338e84501cb6e2549999ebf5de683342045f54699bcfbee",
+    "reason": "RFC-reserved invalid-domain Git or redaction test fixture."
+  },
+  {
+    "path": "tests/cursor-writer.test.ts",
+    "rule": "local.posix-user-path",
+    "lineSha256": "1fe9406d830e0aab0b5a8f7650cf095659c09e8502184c0872b40059e8d15631",
+    "reason": "Deterministic sandbox or WSL fixture path, not a host identity."
+  },
+  {
+    "path": "tests/fixtures/fake-cli/cursor.mjs",
+    "rule": "personal.email",
+    "lineSha256": "3faa80d3180b65cfb13a22df1247a0af6d6b8121120bb348ca77946c481e8596",
+    "reason": "RFC-reserved invalid-domain Git or redaction test fixture."
+  },
+  {
+    "path": "tests/pipeline-git-checkpoint.test.ts",
+    "rule": "personal.email",
+    "lineSha256": "e62c38e16ca069c8360264cb8d3dfcac253ffdb3ca2d9d154df6468b3fefbe94",
+    "reason": "RFC-reserved invalid-domain Git or redaction test fixture."
+  },
+  {
+    "path": "tests/pipeline-git-checkpoint.test.ts",
+    "rule": "personal.email",
+    "lineSha256": "347f31e51d48ae9ae193dcda0ba10b8ed5fd20ef09d37492402b10a4122032e8",
+    "reason": "RFC-reserved invalid-domain Git or redaction test fixture."
+  },
+  {
+    "path": "tests/prepublish-scan.test.ts",
+    "rule": "personal.email",
+    "lineSha256": "ba02abe4e93d6650fa6ac4960f56152d2e8aae3e832d993afc1a63dc4a275788",
+    "reason": "RFC-reserved invalid-domain Git or redaction test fixture."
+  },
+  {
+    "path": "tests/workspace-ignore.test.ts",
+    "rule": "personal.email",
+    "lineSha256": "46b4b88ceb96bac17879edea89a288c38ceaa65f6bebae3bd76b3f59610bd3aa",
+    "reason": "RFC-reserved invalid-domain Git or redaction test fixture."
+  },
+  {
+    "path": "web/src/pages/chat/SettingsPanel.test.tsx",
+    "rule": "secret.api-key",
+    "lineSha256": "efc3e2eb182b286af4513f388b4ab2f5b924fba78bec99ae0919b6ea235ae439",
+    "reason": "Synthetic leak-prevention canary used only by a test."
+  },
+  {
+    "path": "scripts/chat-live-codex-probe.ts",
+    "rule": "local.windows-user-path",
+    "lineSha256": "70361e41cb01659e4079f2daf079e72c4f924cf8a853a3e014430018add4ab97",
+    "reason": "Redaction logic recognizes and replaces Windows user-profile paths."
+  }
+]

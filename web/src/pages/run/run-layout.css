@@ -1,0 +1,95 @@
+/* Run page layout (BUILD-SPEC-B §6.1, WP4). Head band, then the toolbar (10 tabs + tools), then the pane and the 316px
+   context rail (280px at ≤1320). The connection chip lives in the top-bar slot; the page head owns the single h1. */
+.run-page{flex:1;min-height:0;display:flex;flex-direction:column;background:var(--pane)}
+.run-loading{flex:1}
+.run-body{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 316px}
+.context-collapsed .run-body{grid-template-columns:minmax(0,1fr)}
+.run-main{min-width:0;min-height:0;display:flex;flex-direction:column}
+
+/* ---------- toolbar: tabs + tools ----------
+   Ten tabs overflow a narrow main column: the strip keeps a visible thin scrollbar (§3.7) and RunPage scrolls the
+   selected tab into view; at ≤1099px the tools take their own row so the tabs get the full width. */
+.run-toolbar{flex:none;display:flex;align-items:stretch;min-width:0;height:40px;background:var(--surface);border-bottom:1px solid var(--line-2)}
+.run-tabs{position:relative;flex:1;min-width:0;display:flex;align-items:stretch;gap:2px;padding:0 calc(var(--gutter) - 10px);overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;scrollbar-color:var(--line-3) transparent}
+.run-tabs button{position:relative;flex:none;gap:6px;height:100%;min-height:0;padding:0 10px;border:0;border-radius:0;background:transparent;color:var(--ink-2);font-size:var(--fs-ui);font-weight:500;white-space:nowrap}
+.run-tabs button::after{content:"";position:absolute;left:10px;right:10px;bottom:0;height:2px;background:transparent}
+.run-tabs button:hover{background:transparent;color:var(--ink)}
+.run-tabs button[aria-selected=true]{color:var(--ink);font-weight:600}
+.run-tabs button[aria-selected=true]::after{background:var(--ink)}
+.run-tabs button:focus-visible{outline-offset:-4px;box-shadow:none}
+.run-tabs button[data-group-start]{margin-left:13px}
+.run-tabs button[data-group-start]::before{content:"";position:absolute;left:-8px;top:12px;bottom:12px;width:1px;background:var(--line-2)}
+.run-tabs .tab-count{min-width:18px;height:18px;padding:0 5px;border-radius:var(--r1);background:var(--surface-3);color:var(--muted);font:var(--fs-meta)/18px var(--mono);text-align:center}
+.run-tabs .tab-dot{color:var(--gate-ink);font-size:10px;line-height:1}
+.run-tabs .tab-dot::before{content:"◆"}
+.run-tabs .tab-live{width:7px;height:7px;border-radius:50%;background:var(--ok);animation:run-live 1.9s ease-in-out infinite}
+.run-tools{display:flex;flex:none;align-items:center;gap:6px;padding:0 var(--gutter) 0 12px}
+.run-tools .gate.outline>span{font-size:10px;line-height:1}
+
+/* ---------- pane ---------- */
+.run-pane{flex:1;min-height:0;overflow:auto;padding:18px var(--gutter) 0;display:flex;flex-direction:column;container-type:inline-size;container-name:run-pane;scroll-padding-top:12px;scroll-padding-bottom:104px;scrollbar-gutter:stable}
+.run-pane>[role=tabpanel]{flex:none;min-width:0;padding-bottom:32px}
+.run-pane>[role=tabpanel].fill{flex:1 1 0;display:flex;flex-direction:column;min-height:0;padding-bottom:20px}
+.run-pane .panel{border-color:var(--line-2)}
+.overview-active .run-pane{padding:0;container-type:normal;scrollbar-gutter:auto}
+.overview-active .run-pane>[role=tabpanel].fill{padding:0}
+
+/* ---------- context rail ---------- */
+.run-rail{min-width:0;min-height:0;overflow:auto;scrollbar-gutter:stable;display:flex;flex-direction:column;gap:12px;padding:14px;background:var(--surface-2);border-left:1px solid var(--line-2)}
+
+/* ---------- action error strip ---------- */
+.run-error{flex:none;display:flex;align-items:center;gap:10px;padding:8px var(--gutter);background:var(--err-bg);color:var(--err);border-bottom:1px solid var(--err-line);box-shadow:inset 3px 0 0 var(--err);font-size:13px}
+.run-error span{flex:1;min-width:0;overflow-wrap:anywhere}
+
+/* ---------- connection: top-bar chip + status-bar cell (same words) ---------- */
+.run-conn{display:inline-flex;align-items:center;gap:6px;color:var(--ink-2);font-size:12px;white-space:nowrap}
+.run-conn>i{font-style:normal;font-size:10px;line-height:1}
+.run-conn.is-on>i{color:var(--ok)}
+.run-conn.is-wait>i{color:var(--faint)}
+.run-conn.is-warn{color:var(--wait)}
+.run-conn[data-active]>i{animation:run-live 1.9s ease-in-out infinite}
+.run-sb.is-on>i{color:var(--ok)}
+.run-sb.is-wait>i{color:var(--faint)}
+.run-sb.is-warn{color:var(--wait)}
+.run-track,.lp-log,.live-stages{position:relative}
+@keyframes run-live{50%{opacity:.4}}
+
+@media (max-width:1320px){.run-body{grid-template-columns:minmax(0,1fr) 280px}}
+@media (max-width:1099px){
+  .run-page,.run-body,.run-main{display:block}
+  .run-toolbar{height:auto;flex-wrap:wrap}
+  .run-tabs{flex-basis:100%;height:40px}
+  .run-tools{width:100%;justify-content:flex-end;padding:6px var(--gutter);border-top:1px solid var(--line-2)}
+  .run-tools:empty{display:none}
+  .run-pane{overflow:visible;display:block;padding:18px var(--gutter) 28px}
+  .run-rail{border-left:0;border-top:1px solid var(--line-2)}
+}
+
+/* ---------- gate sections (§6.1): the shared .decision-card from styles/base.css inside a .gate-wrap ----------
+   .gate-section / .g1-submit are JS selectors for the gate jump; they sit on the focusable wrapper so the focus ring is
+   not cut by the chamfer clip. The action bar is sticky only while the gate is actionable (.is-sticky). */
+.gate-section,.g1-submit{scroll-margin-top:12px}
+.gate-section:focus,.g1-submit:focus{outline:var(--focus-outline);outline-offset:3px;box-shadow:none}
+.gate-section :is(input,textarea,select){scroll-margin-bottom:104px}
+.gate-section>.decision-card>.decision-in{display:block;padding:16px 18px 18px 22px}
+.gate-section .section-title h2{font-size:var(--fs-gate)}
+.gate-section .section-title .eyebrow{color:var(--gate-ink)}
+.gate-section .section-title .eyebrow::before{content:"◆ "}
+.gate-actions{margin:16px 0 0;padding-top:12px;border-top:1px solid var(--line)}
+.gate-actions.is-sticky{position:sticky;bottom:0;z-index:2;margin:16px -18px -18px -22px;padding:12px 18px 12px 22px;background:var(--surface);box-shadow:0 -8px 18px -14px rgba(41,53,83,.35)}
+/* read-only gate (run ended or not waiting on you): same shape, no indigo — indigo means "waiting on you" only */
+.gate-section.is-readonly{filter:none}
+.gate-section.is-readonly>.decision-card{background:var(--line-2)}
+.gate-section.is-readonly>.decision-card::after{background:var(--line-3)}
+.gate-section.is-readonly>.decision-card>.decision-in{background:var(--surface)}
+.gate-section.is-readonly .section-title .eyebrow{color:var(--muted)}
+.gate-section.is-readonly .section-title .eyebrow::before{content:none}
+.gate-section.is-readonly .gate:disabled{background:var(--ink-2);border-color:var(--ink-2)}
+@media (max-width:1099px){.gate-actions.is-sticky{position:static;margin:16px 0 0;padding:12px 0 0;box-shadow:none}}
+
+/* ---------- page-local type: panel titles read eyebrow + h2 on one baseline; ghost danger keeps its --err text ---------- */
+.run-pane .section-title>div{display:flex;align-items:baseline;flex-wrap:wrap;gap:2px 10px}
+.run-pane .section-title .eyebrow{order:0;margin:0;font-size:12px;font-weight:500;letter-spacing:0}
+.run-pane .section-title h2{order:1}
+.run-page .danger.ghost{color:var(--err)}
+.run-page .danger.ghost:hover:not(:disabled){background:var(--err-bg);color:var(--err)}

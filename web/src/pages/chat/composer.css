@@ -1,0 +1,96 @@
+/* Composer (BUILD-SPEC-B §4.7): the hero input on strong glass (backdrop-filter allowed here only). The send ring turns and
+   the under-glow shows only while work is active (.chat-work[data-active]); otherwise everything is still. */
+.composer-dock{position:relative;padding:10px var(--gutter);border-top:1px solid var(--line);background:var(--pane)}
+.compose-error{max-width:var(--col-max);margin:0 auto 8px;padding:6px 10px;border:1px solid var(--err-line);border-radius:var(--r2);background:var(--err-bg);color:var(--err);font-size:var(--fs-dense)}
+.chat-compose{position:relative;display:grid;gap:8px;max-width:var(--col-max);margin:0 auto;padding:10px 12px 8px;border-radius:var(--r3);transition:border-color var(--t-hover),box-shadow var(--t-hover)}
+/* The textarea is borderless, so the form carries the §3.7 input focus (ink border + field ring) and, for keyboard
+   focus, the ink outline. Keyed to the textarea, not :focus-within, so Tab onto 附件 / 项目 / 协作 / send does not ink it. */
+.chat-compose:has(textarea:focus){border-color:var(--ink);box-shadow:var(--glass-shadow),var(--field-focus)}
+.chat-compose:has(textarea:focus-visible){outline:var(--focus-outline);outline-offset:3px}
+.chat-compose::after{content:"";position:absolute;left:14px;right:14px;bottom:-1px;height:3px;border-radius:2px;background:var(--speak,var(--ink));opacity:0;transition:opacity var(--t-comp);pointer-events:none}
+.chat-work[data-active] .chat-compose::after{opacity:.85}
+.chat-compose.is-dragging{outline:1.5px dashed var(--line-3);outline-offset:3px}
+.chat-compose[aria-disabled=true]{opacity:.7}
+.drop-hint{position:absolute;inset:0;display:grid;place-items:center;border-radius:inherit;background:var(--glass-strong-bg);color:var(--ink-2);font-size:var(--fs-ui);pointer-events:none}
+
+/* run mode: a one-row segmented control (markup unchanged) */
+.pipeline-create{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin:0;padding:0 0 8px;border:0;border-bottom:1px solid var(--line);min-width:0}
+.pipeline-create>legend{float:left;margin-right:2px;padding:0;color:var(--muted);font-size:12px}
+.pipeline-mode{display:inline-flex;padding:2px;border:1px solid var(--line-2);border-radius:var(--r2);background:var(--surface-2)}
+.pipeline-mode label{position:relative;display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:var(--r1);color:var(--ink-2);font-size:var(--fs-dense);cursor:pointer}
+.pipeline-mode input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+.pipeline-mode label:has(input:checked){background:var(--ink);color:var(--on-dark)}
+.pipeline-mode label:has(input:focus-visible){outline:var(--focus-outline);outline-offset:1px}
+.pipeline-create-options{display:contents}
+.pipeline-create-options>label:first-child{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.pipeline-create-options select{width:auto;min-height:28px;height:28px;padding:0 8px;font-size:var(--fs-dense)}
+.pipeline-auto{display:inline-flex;align-items:center;gap:6px;font-size:var(--fs-dense);color:var(--ink-2)}
+.pipeline-workspace-required{margin:0;color:var(--wait);font-size:12px}
+.pipeline-create:disabled{opacity:.6}
+
+/* pending attachments */
+.pending-attachments{display:flex;flex-wrap:wrap;gap:6px;margin:0;padding:0;list-style:none}
+.pending-attachments li{display:inline-flex;align-items:center;gap:6px;height:26px;max-width:100%;padding:0 4px 0 8px;border:1px solid var(--line);border-radius:var(--r2);background:var(--surface-2);font-size:12px}
+.pending-attachments li b{max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
+.pending-attachments li small{color:var(--muted);font-size:var(--fs-meta)}
+.pending-attachments li.is-failed small{color:var(--err)}
+.pending-attachments li button{height:20px;padding:0 6px;border-radius:var(--r1);color:var(--ink-2);font-size:12px}
+.pending-attachments li button:hover{background:var(--hover);color:var(--ink)}
+
+/* textarea */
+.chat-compose textarea{display:block;width:100%;min-height:46px;max-height:min(170px,22vh);padding:2px;border:0;border-radius:0;background:transparent;box-shadow:none;resize:none;font-size:var(--fs-body);line-height:1.6;field-sizing:content}
+.chat-compose textarea:focus{border:0;box-shadow:none;outline:none}
+.chat-compose textarea::placeholder{color:var(--muted)}
+
+/* toolbar */
+.compose-toolbar{display:flex;align-items:center;gap:4px;min-width:0}
+.compose-toolbar .grow{flex:1}
+.compose-toolbar .attach-button{min-height:28px;height:28px;padding:0 8px;font-size:var(--fs-dense)}
+.c-pill{display:inline-flex;align-items:center;gap:6px;min-height:28px;height:28px;max-width:260px;padding:0 8px;border:1px solid var(--line);border-radius:var(--r2);background:rgba(255,255,255,.7);color:var(--ink-2);font-size:var(--fs-dense);font-weight:400;white-space:nowrap;cursor:pointer}
+.c-pill:hover{border-color:var(--line-2);background:var(--surface);color:var(--ink)}
+.c-pill>span{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.c-pill b{font-weight:500;color:var(--ink)}
+.c-pill .mono{font-size:var(--fs-meta)}
+.c-pill.is-static{cursor:default}
+.c-pill.is-unavailable{color:var(--muted)}
+.c-pill[aria-expanded=true]{border-color:var(--line-3);background:var(--surface);color:var(--ink)}
+.compose-stop{display:grid;place-items:center;width:30px;height:30px;min-height:0;padding:0;margin-left:4px;border:1px solid var(--line-2);border-radius:var(--r2);background:var(--surface);color:var(--ink)}
+.compose-send{position:relative;display:grid;place-items:center;width:34px;height:34px;min-height:0;margin-left:6px;padding:0;border:0;border-radius:50%;background:var(--ink);color:var(--on-dark);transition:background-color var(--t-hover),transform var(--t-press)}
+.compose-send:hover{background:var(--ink-hover);color:var(--on-dark)}
+.compose-send:not(:disabled):active{transform:scale(.96)}
+.compose-send:disabled{background:var(--line-3);color:var(--on-dark);opacity:1}
+.compose-send::before{content:"";position:absolute;inset:-4px;border:1px solid var(--line-2);border-radius:50%;pointer-events:none}
+.chat-work[data-active] .compose-send::before{border-color:transparent;border-top-color:var(--speak,var(--ink));border-right-color:var(--speak,var(--ink));animation:send-ring 3s linear infinite}
+@keyframes send-ring{to{transform:rotate(1turn)}}
+:root[data-motion=reduce] .chat-work[data-active] .compose-send::before{border-color:var(--speak,var(--ink))}
+
+/* popovers anchored in the toolbar */
+.popover-panel.project-pop{width:min(360px,calc(100vw - 48px));display:grid;gap:8px}
+.popover-panel.project-pop p{margin:0;font-size:12px;line-height:1.6}
+.popover-panel.project-pop select{font-size:var(--fs-dense)}
+.popover-panel.project-pop .workspace-choose{justify-self:start}
+.workspace-manage{display:grid;gap:6px;padding-top:6px;border-top:1px solid var(--line)}
+.manage-toggle{gap:4px;color:var(--ink-2);font-size:12px}
+.workspace-grants{display:grid;gap:6px;margin:0;padding:0;list-style:none}
+.workspace-grants li{display:grid;gap:4px;font-size:12px}
+.workspace-grants li>span:first-child{display:grid;min-width:0}
+.workspace-grants small{color:var(--muted);overflow-wrap:anywhere}
+.workspace-grants li>.btn{justify-self:start}
+.grant-confirm{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:6px 8px;border:1px solid var(--err-line);border-radius:var(--r2);background:var(--surface)}
+.grant-confirm>span{flex:1 1 100%;color:var(--ink-2)}
+.popover-panel.collab-pop{width:300px}
+.collab-pop p{margin:0 0 6px;color:var(--muted);font-size:12px;line-height:1.6}
+.collab-rows{margin:0;padding:0;list-style:none}
+.collab-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--line);font-size:var(--fs-dense)}
+.collab-row:first-child{border-top:0}
+.collab-row b{font-weight:500}
+.collab-row>span:last-child{margin-left:auto;font-size:12px;text-align:right}
+.compose-toolbar .popover-panel[data-placement=up]{bottom:calc(100% + 10px)}
+
+/* foot */
+.compose-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;max-width:var(--col-max);min-height:20px;margin:6px auto 0;color:var(--muted);font-size:12px}
+.foot-left,.foot-right{min-width:0}
+.foot-right{text-align:right}
+.cost-confirm{display:inline-flex;align-items:center;gap:6px;color:var(--ink-2);cursor:pointer}
+.cost-confirmed{display:inline-flex;align-items:center;gap:4px;color:var(--ink-2)}
+.cost-confirmed button{color:var(--ink-2);font-size:12px;text-decoration:underline;text-underline-offset:2px}

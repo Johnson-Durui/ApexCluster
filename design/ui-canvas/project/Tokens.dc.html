@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>设计规范</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+body{margin:0;background:#F2F3F5}
+.wb{--font:"Segoe UI Variable Text","Segoe UI","Microsoft YaHei UI","Microsoft YaHei","PingFang SC","Noto Sans SC",sans-serif;--mono:"Cascadia Mono","Cascadia Code",Consolas,"JetBrains Mono",monospace;--bg:#F2F3F5;--panel:#FFFFFF;--panel-2:#F7F8FA;--surface-3:#EDEFF2;--line:#E0E3E8;--line-2:#C8CDD5;--text:#16191F;--text-2:#3D4450;--muted:#5F6773;--accent:#16191F;--appbar:#14171C;--gate:#4338CA;--gate-ink:#3730A3;--gate-bg:#EEF0FD;--gate-line:#C7CCF5;--claude:#B4532A;--claude-ink:#9A431F;--claude-bg:#FBEEE6;--astra:#1C6B88;--astra-ink:#155A73;--astra-bg:#E5F1F5;--sol:#8A6A06;--sol-ink:#6F5505;--sol-bg:#F6EFD9;--ok:#1D7146;--ok-bg:#E7F3EC;--warn:#975006;--warn-bg:#FBF1E3;--bad:#B42318;--bad-bg:#FDEDEB;--info:#2457A6;--info-bg:#EAF0FA;--radius:8px;--rail-w:340px;font-family:var(--font);font-size:14px;line-height:1.6;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased;position:relative;min-width:0}
+.wb *{box-sizing:border-box}
+.wb sc-for,.wb sc-if{display:contents}
+:where(.wb) a{color:inherit;text-decoration:none}
+:where(.wb) a:hover{color:var(--gate-ink)}
+.wb h1,.wb h2,.wb h3,.wb h4,.wb p{margin-top:0}
+.wb h1{font-size:24px;line-height:1.3;font-weight:700;letter-spacing:-.01em;margin-bottom:6px}
+.wb h2{font-size:16px;line-height:1.4;font-weight:650;margin-bottom:0}
+.wb h3{font-size:14.5px;line-height:1.5;font-weight:650;margin-bottom:0}
+.wb h4{font-size:13px;font-weight:650;margin-bottom:0}
+.wb p{line-height:1.7}
+.wb small{font-size:12.5px;line-height:1.55}
+:where(.wb) ul,:where(.wb) ol{padding-left:20px;line-height:1.75;margin:0}
+.wb code,.wb .mono{font-family:var(--mono);font-size:12.5px;overflow-wrap:anywhere}
+.wb summary{cursor:pointer;font-weight:600;line-height:1.65}
+.muted{color:var(--muted)}
+.small{font-size:12.5px}
+.eyebrow{color:var(--muted);font-size:12px;letter-spacing:.04em;font-weight:600;margin-bottom:4px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.num{font-variant-numeric:tabular-nums}
+.icon{flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle}
+.wb button,.wb .button{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:34px;max-width:100%;padding:6px 13px;border:1px solid var(--line-2);border-radius:6px;background:var(--panel);color:var(--text);font:inherit;font-size:13.5px;font-weight:550;line-height:1.4;cursor:pointer;text-align:center}
+.wb button:hover,.wb .button:hover{background:var(--panel-2);border-color:#A9B0BA;color:var(--text)}
+.wb .primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.wb .primary:hover{background:#2B313B;border-color:#2B313B;color:#fff}
+.wb .gate{background:var(--gate);border-color:var(--gate);color:#fff}
+.wb .gate:hover{background:var(--gate-ink);border-color:var(--gate-ink);color:#fff}
+.wb .danger{color:var(--bad);border-color:#E9C2BD}
+.wb .ghost{background:transparent;border-color:transparent}
+.wb .compact{min-height:28px;padding:3px 9px;font-size:12.5px}
+.wb button:disabled{opacity:.45;cursor:not-allowed}
+.wb input,.wb textarea,.wb select{font:inherit;font-size:14px;padding:8px 10px;min-height:36px;width:100%;min-width:0;border:1px solid var(--line-2);border-radius:6px;background:#fff;color:var(--text)}
+.wb textarea{resize:vertical;min-height:84px;line-height:1.6}
+.wb input[type=checkbox],.wb input[type=radio]{width:16px;min-height:16px;height:16px;padding:0;accent-color:var(--gate);flex:none}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0;font-size:13px;margin-bottom:16px}
+.field>span:first-child{font-weight:600;color:var(--text-2)}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:2px 18px}
+.check-label{display:flex;align-items:center;gap:9px;font-size:13.5px;line-height:1.6;cursor:pointer}
+.row,.btnbar{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.btnbar{margin-top:14px}
+.badge{display:inline-flex;align-items:center;gap:4px;min-height:22px;padding:2px 8px;border:1px solid var(--line);border-radius:4px;background:var(--panel-2);color:var(--text-2);font-size:12px;font-weight:600;line-height:1.35;white-space:nowrap}
+.badge.ok{color:var(--ok);background:var(--ok-bg);border-color:#C4DFCD}
+.badge.warn{color:var(--warn);background:var(--warn-bg);border-color:#EED6B6}
+.badge.bad{color:var(--bad);background:var(--bad-bg);border-color:#F1C5BF}
+.badge.info{color:var(--info);background:var(--info-bg);border-color:#C7D6EE}
+.badge.gate{color:#fff;background:var(--gate);border-color:var(--gate)}
+.badge.gate-soft{color:var(--gate-ink);background:var(--gate-bg);border-color:var(--gate-line)}
+.badge.real{color:var(--text-2);background:var(--panel-2);border-color:var(--line-2)}
+.badge.claude{color:var(--claude-ink);background:var(--claude-bg);border-color:#EBCDBB}
+.badge.astra{color:var(--astra-ink);background:var(--astra-bg);border-color:#BBD9E4}
+.badge.sol{color:var(--sol-ink);background:var(--sol-bg);border-color:#E4D3A3}
+.mtag{display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 5px;border-radius:5px;color:#fff;font-size:11.5px;font-weight:700;line-height:1;flex:none;background:var(--text-2)}
+.mtag.claude{background:var(--claude)}.mtag.astra{background:var(--astra)}.mtag.sol{background:var(--sol)}
+.mtag.ultra{background:#0E3F52;box-shadow:0 0 0 2px #fff,0 0 0 3.5px var(--astra)}
+.alert{display:block;padding:10px 14px;border-radius:6px;border:1px solid var(--line);font-size:13.5px;line-height:1.65;overflow-wrap:anywhere;background:var(--panel-2)}
+.alert.warn{background:var(--warn-bg);color:var(--warn);border-color:#EED6B6}
+.alert.bad{background:var(--bad-bg);color:var(--bad);border-color:#F1C5BF}
+.alert.info{background:var(--info-bg);color:var(--info);border-color:#C7D6EE}
+.help-note{font-size:12.5px;color:var(--muted);line-height:1.65;margin:8px 0}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;min-width:0}
+.section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.section-title>div{min-width:0}
+.section-title .eyebrow{margin-bottom:2px}
+.page-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.page-heading h1{margin-bottom:4px}
+.page-heading p{margin:0;font-size:13.5px}
+.wb .anchor-link{font-size:12.5px;color:var(--gate-ink);text-decoration:underline}
+.table-scroll{position:relative;overflow:auto;max-width:100%}
+.wb table{border-collapse:collapse;width:100%;font-size:13px;text-align:left}
+.wb th,.wb td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.6}
+.wb th{background:var(--panel-2);font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap}
+.wb td{overflow-wrap:anywhere}
+.log{background:#0F1217;color:#D6DAE0;border-radius:6px;padding:10px 12px;font:12px/1.75 var(--mono);white-space:pre-wrap;overflow-wrap:anywhere;margin:0}
+.seg-control{display:inline-flex;flex-wrap:wrap;padding:3px;gap:2px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px}
+.wb .seg-control button{min-height:30px;padding:3px 12px;border:0;border-radius:6px;background:transparent;color:var(--muted);font-size:13px}
+.wb .seg-control button.on{background:var(--text);color:#fff}
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,160px),1fr));gap:14px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px 18px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.stat b{font-size:26px;line-height:1.25;font-weight:700;font-variant-numeric:tabular-nums}
+.stat span{font-size:13px;font-weight:600;color:var(--text-2)}
+.stat small{color:var(--muted)}
+.stat.attention{border-color:var(--gate-line);background:var(--gate-bg)}
+.stat.attention b{color:var(--gate-ink)}
+.stat.warn{border-color:#EED6B6;background:var(--warn-bg)}
+.stat.warn b{color:var(--warn)}
+.gate-section{border:1.5px solid var(--gate);box-shadow:0 0 0 4px var(--gate-bg)}
+.gate-section>.section-title h2{color:var(--gate-ink)}
+.gate-actions{position:sticky;bottom:0;z-index:2;margin:16px -20px -18px;padding:12px 20px;background:#fff;border-top:1px solid var(--line);border-radius:0 0 var(--radius) var(--radius)}
+.empty-symbol{display:inline-grid;place-items:center;width:52px;height:52px;border-radius:12px;background:var(--surface-3);color:var(--muted)}
+
+/* 应用外壳 */
+.app{display:flex;flex-direction:column;min-width:0}
+.app.fixed{height:100vh;min-height:860px}
+.appbar{flex:none;display:flex;align-items:center;gap:28px;min-height:52px;padding:0 24px;background:var(--appbar);color:#E6E8EC;border-bottom:1px solid #000}
+.appbar-brand{display:flex;align-items:center;gap:10px;color:#fff;min-width:0}
+.wb .appbar-brand:hover{color:#fff}
+.appbar-brand b{display:block;font-size:14.5px;font-weight:650;letter-spacing:.01em;white-space:nowrap}
+.appbar-brand small{display:block;font-size:11.5px;color:#9EA5B0;white-space:nowrap}
+.appnav{position:relative;display:flex;align-items:center;gap:2px;flex-wrap:wrap}
+.appnav a{display:inline-flex;align-items:center;gap:7px;min-height:36px;padding:0 12px;border-radius:6px;color:#B7BDC7;font-size:13.5px;font-weight:550}
+.wb .appnav a:hover{color:#fff;background:#232831}
+.appnav a.active{color:#fff;background:#2A303A}
+.appbar-meta{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12.5px;color:#9EA5B0;white-space:nowrap}
+.appbar-dot{width:7px;height:7px;border-radius:50%;background:#4CB27A;box-shadow:0 0 0 3px rgba(76,178,122,.18)}
+.page{display:flex;flex-direction:column;gap:20px;padding:24px 32px 48px;max-width:2400px;margin:0 auto;width:100%;min-width:0}
+
+/* 运行页 */
+.run-page{flex:1;min-height:0;display:flex;flex-direction:column}
+.run-head{flex:none;display:flex;flex-direction:column;gap:10px;padding:12px 24px 10px;background:var(--panel);border-bottom:1px solid var(--line)}
+.run-head-top{display:flex;align-items:center;gap:10px 16px;flex-wrap:wrap}
+.run-title-main{flex:1 1 320px;min-width:0}
+.run-title-main h1{font-size:20px;line-height:1.35;margin:0 0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.run-chips{display:flex;align-items:center;gap:6px 10px;flex-wrap:wrap;font-size:12.5px}
+.run-chips .mono{font-size:12px}
+.run-conn{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;color:var(--muted)}
+.run-conn i{width:7px;height:7px;border-radius:50%;background:var(--ok)}
+.run-head-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;flex:none}
+.wb .run-head-actions button,.wb .run-head-actions .button{min-height:32px;padding:4px 10px;font-size:13px}
+.run-track{position:relative;min-width:0;overflow-x:auto;padding:2px}
+.run-track-compact{display:none}
+.model-strip{display:flex;gap:8px;flex-wrap:wrap;list-style:none;margin:0;padding:0;flex:0 1 auto}
+.wb .ms{position:relative;display:flex;align-items:center;gap:8px;justify-content:flex-start;min-width:172px;max-width:240px;min-height:40px;padding:4px 10px;border-radius:8px;background:var(--panel-2);border:1px solid var(--line);text-align:left;font-weight:400}
+.ms-text{display:flex;flex-direction:column;min-width:0}
+.ms-text b{font-size:13px;font-weight:650;line-height:1.3}
+.ms-text small{font-size:12px;color:var(--muted);line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wb .ms.running{border-color:#BFD0EC;background:var(--info-bg)}
+.ms.running .ms-text small{color:var(--info)}
+.ms-live{position:absolute;top:7px;right:8px;width:7px;height:7px;border-radius:50%;background:var(--ok)}
+.gate-track{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:minmax(84px,1fr) auto minmax(150px,1.7fr) auto minmax(104px,1.1fr) auto minmax(80px,.9fr) auto minmax(76px,.85fr) auto minmax(44px,.45fr);align-items:start;column-gap:8px;min-width:820px}
+.gt{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:66px;text-align:center}
+.gt-node{display:grid;place-items:center;min-width:40px;height:28px;padding:0 8px;border-radius:6px;border:1.5px solid var(--line-2);background:#fff;color:var(--muted);font-size:12.5px;font-weight:700}
+.gt-label{font-size:12px;font-weight:600;color:var(--text-2);line-height:1.3;white-space:nowrap}
+.gt-state{font-size:11px;color:var(--muted);line-height:1.2}
+.gt.done .gt-node{background:var(--text);border-color:var(--text);color:#fff}
+.gt.now .gt-node{background:var(--gate);border-color:var(--gate);color:#fff;box-shadow:0 0 0 4px var(--gate-bg)}
+.gt.now .gt-label,.gt.now .gt-state{color:var(--gate-ink);font-weight:700}
+.gt.stopped .gt-node{border-color:var(--bad);color:var(--bad);background:var(--bad-bg)}
+.gt.stopped .gt-label,.gt.stopped .gt-state{color:var(--bad);font-weight:700}
+.gt.off .gt-node{border-style:dashed;background:transparent;color:#9AA1AB}
+.gt.off .gt-label{color:#9AA1AB}
+.gs{display:flex;flex-direction:column;gap:6px;padding-top:13px;min-width:0}
+.gs-bar{display:block;height:3px;border-radius:3px;background:var(--line-2);overflow:hidden}
+.gs-bar i{display:block;height:100%;background:var(--text)}
+.gs.now .gs-bar i{background:var(--gate)}
+.gs.blocked .gs-bar i{background:var(--bad)}
+.gs.off .gs-bar{background:transparent;border-top:2px dashed var(--line-2);height:0}
+.gs-steps{display:flex;justify-content:space-between;gap:6px;flex-wrap:wrap;font-size:11.5px;line-height:1.35}
+.gs-step{color:var(--muted);white-space:nowrap}
+.gs-step.done{color:var(--text-2)}
+.gs-step.now{color:var(--gate-ink);font-weight:700}
+.gs-step.blocked{color:var(--bad);font-weight:700}
+.gs-step.off{color:#9AA1AB}
+.gs-loop{display:inline-flex;align-items:center;gap:5px;flex-wrap:wrap;font-size:11px;color:var(--muted);line-height:1.3}
+.gs-loop.active{color:var(--gate-ink)}
+.gate-pips{display:inline-flex;gap:3px}
+.gp{display:inline-grid;place-items:center;width:28px;height:20px;border-radius:4px;border:1px solid var(--line-2);background:#fff;color:var(--muted);font-size:10.5px;font-weight:700;line-height:1}
+.gp.done{background:var(--text);border-color:var(--text);color:#fff}
+.gp.now{background:var(--gate);border-color:var(--gate);color:#fff}
+.gp.blocked{background:var(--bad);border-color:var(--bad);color:#fff}
+.gp.stopped{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+.gp.off{border-style:dashed;background:transparent;color:#A3A9B2}
+.blocked-bar{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:6px;font-size:13.5px;background:var(--bad-bg);border:1px solid #F1C5BF;color:var(--bad);flex-wrap:wrap}
+.blocked-bar>div:nth-child(2){flex:1 1 280px;min-width:0}
+.blocked-bar p{margin:2px 0 0;color:var(--text-2)}
+.run-body{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) var(--rail-w)}
+.run-main{min-width:0;min-height:0;display:flex;flex-direction:column}
+.run-tabs{position:relative;flex:none;display:flex;gap:2px;padding:0 20px;background:var(--panel);border-bottom:1px solid var(--line);overflow-x:auto}
+.wb .run-tabs a{flex:none;display:inline-flex;align-items:center;gap:6px;border-bottom:2px solid transparent;min-height:44px;padding:0 13px;color:var(--muted);font-weight:600;font-size:13.5px;white-space:nowrap}
+.wb .run-tabs a:hover{color:var(--text)}
+.wb .run-tabs a.on{color:var(--text);border-bottom-color:var(--text)}
+.tab-count{min-width:20px;height:18px;padding:0 6px;border-radius:9px;background:var(--surface-3);color:var(--text-2);font-size:11.5px;line-height:18px;text-align:center}
+.tab-dot{width:7px;height:7px;border-radius:50%;background:var(--gate)}
+.tab-live{width:7px;height:7px;border-radius:50%;background:var(--ok)}
+.run-pane{flex:1;min-height:0;padding:20px 24px 28px;display:flex;flex-direction:column;gap:16px}
+.app.fixed .run-pane{overflow:auto;padding-bottom:20px}
+.run-rail{min-height:0;background:var(--panel-2);border-left:1px solid var(--line);padding:16px;display:flex;flex-direction:column;gap:14px}
+.app.fixed .run-rail{overflow:auto}
+.rail-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.rail-card p{margin:0;font-size:13.5px;color:var(--text-2)}
+.rail-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.rail-head h2{font-size:14.5px;margin:0;flex:1 1 auto;min-width:0}
+.rail-head .mono{font-size:11.5px}
+.rail-card.is-gate{border:1.5px solid var(--gate);background:linear-gradient(var(--gate-bg),var(--gate-bg)) top/100% 4px no-repeat,var(--panel)}
+.rail-card.is-gate h2{color:var(--gate-ink)}
+.rail-card.running{border-color:#BFD0EC}
+.rail-card>.button,.rail-card>button{align-self:flex-start}
+.rail-live{width:8px;height:8px;border-radius:50%;background:var(--ok);flex:none}
+.rail-tasks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.rail-tasks li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:8px;font-size:13px}
+.rail-note{font-size:12.5px;color:var(--info)}
+.rail-questions{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.wb .rail-questions a{display:flex;width:100%;justify-content:flex-start;align-items:flex-start;gap:8px;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--panel-2);text-align:left;font-size:13px}
+.rail-questions .mono{font-size:12px;color:var(--muted);flex:none;line-height:1.55}
+.rail-q-text{flex:1;min-width:0;line-height:1.5}
+.wb .rail-link{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;color:var(--gate-ink);font-size:13px;font-weight:550}
+.rail-counts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;margin:0;background:var(--line);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.rail-counts div{background:var(--panel-2);padding:6px 8px;text-align:center}
+.rail-counts dt{font-size:11.5px;color:var(--muted)}
+.rail-counts dd{margin:0;font-size:15px;font-weight:700}
+.rail-constraints{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;font-size:13px}
+.rail-constraints li{display:flex;gap:8px;align-items:flex-start}
+.rail-models{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.rail-models li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;font-size:12.5px}
+.rail-kv{display:grid;grid-template-columns:auto minmax(0,1fr);gap:5px 12px;margin:0;font-size:12.5px}
+.rail-kv dt{color:var(--muted)}
+.rail-kv dd{margin:0;overflow-wrap:anywhere}
+
+@media(min-width:1600px){.wb{--rail-w:380px}}
+@media(max-width:1099px){
+  .app.fixed{height:auto;min-height:0}
+  .run-body{display:block}
+  .run-pane,.app.fixed .run-pane{overflow:visible;padding:18px 20px 28px}
+  .run-rail{border-left:0;border-top:1px solid var(--line)}
+  .gate-actions{position:static;margin:16px 0 0;padding:12px 0 0;border-radius:0}
+}
+@media(max-width:900px){.wb .ms{min-width:0;max-width:none;width:100%}.model-strip{flex:1 1 100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:760px){
+  .appbar{gap:12px;padding:8px 16px;flex-wrap:wrap}
+  .appbar-brand small,.appbar-meta{display:none}
+  .appnav{width:100%;overflow-x:auto;flex-wrap:nowrap}
+  .page{padding:18px 16px 36px}
+  .run-head{padding:10px 16px 12px}
+  .run-title-main h1{white-space:normal}
+  .run-head-actions{justify-content:flex-start}
+  .run-track{display:none}
+  .run-track-compact{display:flex;align-items:center;gap:8px}
+  .run-tabs{padding:0 8px}
+  .run-pane,.app.fixed .run-pane{padding:16px}
+  .panel{padding:16px}
+  .wb h1{font-size:21px}
+  .stat b{font-size:22px}
+}
+
+.tk-hero{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.tk-hero p{max-width:760px;margin:0;color:var(--text-2)}
+.tk-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:20px;align-items:start}
+.tk-swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.tk-sw{border:1px solid var(--line);border-radius:6px;overflow:hidden;background:#fff;font-size:12px}
+.tk-sw i{display:block;height:48px;border-bottom:1px solid var(--line)}
+.tk-sw div{padding:6px 8px;display:flex;flex-direction:column}
+.tk-sw b{font-size:12.5px}
+.tk-rule{font-size:13px;color:var(--text-2);margin:12px 0 0}
+.tk-type{display:flex;flex-direction:column;gap:10px}
+.tk-type div{display:grid;grid-template-columns:140px minmax(0,1fr);gap:16px;align-items:baseline;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.tk-type small{color:var(--muted)}
+.tk-demo{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tk-label{font-size:12px;color:var(--muted);font-weight:600;margin:14px 0 6px}
+.tk-label:first-child{margin-top:0}
+.tk-stack{display:flex;flex-direction:column;gap:10px}
+.tk-gate{padding:16px 18px}
+.tk-space{display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap}
+.tk-space div{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.tk-space i{display:block;background:var(--gate-bg);border:1px solid var(--gate-line)}
+.tk-dont{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px;font-size:13px}
+.tk-dont li{display:flex;gap:8px;align-items:flex-start}
+.tk-dont .icon{color:var(--bad);margin-top:3px}
+</style>
+</helmet>
+<div class="wb app">
+<header class="appbar">
+  <a href="Main.dc.html" class="appbar-brand"><svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#2A303A"></rect><path d="M7.5 9.5 16 16" stroke="#E0784B" stroke-width="2.6" stroke-linecap="round"></path><path d="M7.5 22.5 16 16" stroke="#5DB4D2" stroke-width="2.6" stroke-linecap="round"></path><path d="M22 8.5v15" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round"></path></svg><span><b>双模型架构工作台</b><small>Claude · Astra 设计评审 · Sol 构建验证</small></span></a>
+  <nav class="appnav" aria-label="主导航"><a href="Main.dc.html" class="active" aria-current="page"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h.01M3 18h.01M3 6h.01M8 12h13M8 18h13M8 6h13"></path></svg>运行列表</a><a href="New.dc.html"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>新建评审</a><a href="Env.dc.html"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path></svg>环境检查</a></nav>
+  <div class="appbar-meta"><span class="appbar-dot" aria-hidden="true"></span>本机服务 · 仅监听 127.0.0.1</div>
+</header>
+<main class="page">
+  <header class="tk-hero">
+    <div><div class="eyebrow">v0.4 · 设计规范</div><h1>正式、满屏的决策工作台</h1><p>中性纸面、白色面板、墨色文字。靛蓝只表示“等你决定”；模型颜色只用于字母标识；状态色只表达结果。界面铺满屏幕，模型生成时并排占满主区。</p></div>
+    <span class="badge info">与 web/src/styles-base.css 一致</span>
+  </header>
+  <div class="tk-grid">
+    <section class="panel">
+      <div class="section-title"><div><div class="eyebrow">色板</div><h2>颜色</h2></div></div>
+      <div class="tk-label">底色与文字</div>
+      <div class="tk-swatches"><div class="tk-sw"><i style="background: #F2F3F5"></i><div><b>纸面 bg</b><span class="mono">#F2F3F5</span></div></div><div class="tk-sw"><i style="background: #FFFFFF"></i><div><b>面板 panel</b><span class="mono">#FFFFFF</span></div></div><div class="tk-sw"><i style="background: #F7F8FA"></i><div><b>次级面板 panel-2</b><span class="mono">#F7F8FA</span></div></div><div class="tk-sw"><i style="background: #E0E3E8"></i><div><b>分隔线 line</b><span class="mono">#E0E3E8</span></div></div><div class="tk-sw"><i style="background: #16191F"></i><div><b>正文 text</b><span class="mono">#16191F</span></div></div><div class="tk-sw"><i style="background: #3D4450"></i><div><b>次级文字 text-2</b><span class="mono">#3D4450</span></div></div><div class="tk-sw"><i style="background: #5F6773"></i><div><b>说明 muted</b><span class="mono">#5F6773</span></div></div><div class="tk-sw"><i style="background: #14171C"></i><div><b>顶栏 appbar</b><span class="mono">#14171C</span></div></div></div>
+      <div class="tk-label">关卡（只用于“等你决定”）</div>
+      <div class="tk-swatches"><div class="tk-sw"><i style="background: #4338CA"></i><div><b>gate</b><span class="mono">#4338CA</span><small class="muted">关卡节点、主按钮</small></div></div><div class="tk-sw"><i style="background: #3730A3"></i><div><b>gate-ink</b><span class="mono">#3730A3</span><small class="muted">关卡文字</small></div></div><div class="tk-sw"><i style="background: #EEF0FD"></i><div><b>gate-bg</b><span class="mono">#EEF0FD</span><small class="muted">关卡底色</small></div></div><div class="tk-sw"><i style="background: #C7CCF5"></i><div><b>gate-line</b><span class="mono">#C7CCF5</span><small class="muted">关卡描边</small></div></div></div>
+      <div class="tk-label">模型标识（只用于字母标签和卡片顶边）</div>
+      <div class="tk-swatches"><div class="tk-sw"><i style="background: #B4532A"></i><div><b>Claude</b><span class="mono">#B4532A</span></div></div><div class="tk-sw"><i style="background: #1C6B88"></i><div><b>Astra</b><span class="mono">#1C6B88</span></div></div><div class="tk-sw"><i style="background: #0E3F52"></i><div><b>Astra Ultra</b><span class="mono">#0E3F52</span></div></div><div class="tk-sw"><i style="background: #8A6A06"></i><div><b>Sol</b><span class="mono">#8A6A06</span></div></div></div>
+      <div class="tk-label">状态</div>
+      <div class="tk-swatches"><div class="tk-sw"><i style="background: #1D7146"></i><div><b>ok</b><span class="mono">#1D7146</span></div></div><div class="tk-sw"><i style="background: #975006"></i><div><b>warn</b><span class="mono">#975006</span></div></div><div class="tk-sw"><i style="background: #B42318"></i><div><b>bad</b><span class="mono">#B42318</span></div></div><div class="tk-sw"><i style="background: #2457A6"></i><div><b>info</b><span class="mono">#2457A6</span></div></div></div>
+    </section>
+    <section class="panel">
+      <div class="section-title"><div><div class="eyebrow">排版</div><h2>字体与字号</h2></div></div>
+      <div class="tk-type">
+        <div><small>正文字体</small><span>Segoe UI Variable / 微软雅黑；不加载外部字体</span></div>
+        <div><small>等宽字体</small><span class="mono">Cascadia Mono · r-20261012-3ee667</span></div>
+        <div><small>页面标题 24 / 700</small><span style="font-size: 24px; font-weight: 700">运行列表</span></div>
+        <div><small>运行标题 20 / 700</small><span style="font-size: 20px; font-weight: 700">本地个人记账与预算工具</span></div>
+        <div><small>区块标题 16 / 650</small><span style="font-size: 16px; font-weight: 650">确认框架与 MVP 范围</span></div>
+        <div><small>正文 14 / 400</small><span>界面文字一律简体中文，行高 1.6。</span></div>
+        <div><small>说明 12.5 / 400</small><span class="muted small">更新于 10/12 14:47 · 实时同步</span></div>
+        <div><small>眉题 12 / 600</small><span class="eyebrow" style="margin: 0">G2 · 由你决定</span></div>
+      </div>
+      <div class="section-title" style="margin-top: 20px"><div><h2>间距与圆角</h2></div></div>
+      <div class="tk-space"><div><i style="width: 8px; height: 8px"></i>8</div><div><i style="width: 12px; height: 12px"></i>12</div><div><i style="width: 16px; height: 16px"></i>16</div><div><i style="width: 20px; height: 20px"></i>20</div><div><i style="width: 24px; height: 24px"></i>24</div><div><i style="width: 32px; height: 32px"></i>32</div></div>
+      <p class="tk-rule">面板 8px 圆角、按钮与输入框 6px、标签 4px；几乎不用阴影，只有关卡面板用 4px 靛蓝光圈。</p>
+    </section>
+    <section class="panel">
+      <div class="section-title"><div><div class="eyebrow">组件</div><h2>按钮与标签</h2></div></div>
+      <div class="tk-label">按钮</div>
+      <div class="tk-demo"><button type="button" class="gate">确认框架并进入 MVP 验证</button><button type="button" class="primary"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>新建评审</button><button type="button"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>刷新</button><button type="button" class="danger"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="1.5"></rect></svg>取消运行</button><button type="button" class="compact">打开<svg class="icon" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></button></div>
+      <p class="tk-rule">靛蓝按钮只用于推进关卡；墨色主按钮用于普通主要操作；危险操作用红字描边。</p>
+      <div class="tk-label">状态标签</div>
+      <div class="tk-demo"><span class="badge real">真实运行</span><span class="badge gate">确认框架 G2 · 等待你确认</span><span class="badge gate-soft">3 题未回答</span><span class="badge info">进行中</span><span class="badge ok">输出合法</span><span class="badge warn">有分歧</span><span class="badge bad">已阻塞</span><span class="badge">待校验</span></div>
+      <p class="tk-rule">任务状态和输出合法性是两个独立标签：模型完成生成、输出结构合法、方案通过评审、原型通过验证是四种不同的状态。</p>
+      <div class="tk-label">参与者</div>
+      <div class="tk-demo"><span class="row"><span class="mtag claude">C</span><b>Claude</b></span><span class="row"><span class="mtag astra">A</span><b>Astra</b></span><span class="row"><span class="mtag astra ultra">A</span><b>Astra Ultra</b></span><span class="row"><span class="mtag sol">S</span><b>Sol</b></span></div>
+    </section>
+    <section class="panel">
+      <div class="section-title"><div><div class="eyebrow">标志元素</div><h2>关卡进度</h2></div></div>
+      <div class="tk-stack">
+        <div class="tk-demo"><span class="gate-pips" role="img" aria-label="关卡进度：G1已完成，G2等你决定，G3未开始，G4未开始，G5未开始"><span class="gp done">G1</span><span class="gp now">G2</span><span class="gp todo">G3</span><span class="gp todo">G4</span><span class="gp todo">G5</span></span><span class="small muted">正在 G2 等你决定</span></div>
+        <div class="tk-demo"><span class="gate-pips" role="img" aria-label="关卡进度：G1已完成，G2已完成，G3已关闭，G4等你决定，G5未开始"><span class="gp done">G1</span><span class="gp done">G2</span><span class="gp off">G3</span><span class="gp now">G4</span><span class="gp todo">G5</span></span><span class="small muted">新建时关闭了构建前文档（虚线 = 已关闭）</span></div>
+        <div class="tk-demo"><span class="gate-pips" role="img" aria-label="关卡进度：G1已完成，G2在此停止，G3已关闭，G4未开始，G5已关闭"><span class="gp done">G1</span><span class="gp stopped">G2</span><span class="gp off">G3</span><span class="gp todo">G4</span><span class="gp off">G5</span></span><span class="small muted">在 G2 停止：显示“在此停止”，不显示为全部完成</span></div>
+        <div class="tk-demo"><span class="gate-pips" role="img" aria-label="关卡进度：G1已完成，G2undefined，G3未开始，G4未开始，G5未开始"><span class="gp done">G1</span><span class="gp blocked">G2</span><span class="gp todo">G3</span><span class="gp todo">G4</span><span class="gp todo">G5</span></span><span class="small muted">已阻塞</span></div>
+      </div>
+      <p class="tk-rule">完整进度条 = 5 道关卡 + 6 段模型工作；复核分歧与 Ultra 裁决是 G2 前的按需回路。手机上只显示 G1–G5 小方块。</p>
+      <div class="tk-label">关卡卡片</div>
+      <section class="panel gate-section tk-gate"><div class="section-title"><div><div class="eyebrow">G2 · 由你决定</div><h2>确认框架与 MVP 范围</h2></div><span class="badge info">等待确认</span></div><p class="small muted" style="margin: 0">关卡面板用靛蓝描边和光圈，底部操作条在滚动时固定。</p></section>
+    </section>
+    <section class="panel">
+      <div class="section-title"><div><div class="eyebrow">满屏</div><h2>布局</h2></div></div>
+      <ul class="tk-dont">
+        <li><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg><span>应用外壳固定深色顶栏，主区域占满视口；普通页面最宽 2400px。</span></li>
+        <li><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg><span>运行页：顶部信息带（标题、状态、三位执行端、5 道关卡）＋ 主区标签页 ＋ 右侧上下文栏（340–420px），宽屏下各自滚动。</span></li>
+        <li><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg><span>执行过程：同一阶段的模型任务并排成列，占满主区宽度并延伸到底部，日志自动跟随。</span></li>
+        <li><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg><span>宽度不足 1100px 或高度不足 640px 时改为整页滚动；760px 以下为手机布局。</span></li>
+      </ul>
+    </section>
+    <section class="panel">
+      <div class="section-title"><div><div class="eyebrow">约束</div><h2>不要这样做</h2></div></div>
+      <ul class="tk-dont">
+        <li><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"></path></svg><span>不提供模拟模式。早期模拟记录默认隐藏，打开时带“模拟数据 · 早期测试记录”横幅。</span></li>
+        <li><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"></path></svg><span>不把靛蓝用于非关卡元素，不把模型色用于大面积底色。</span></li>
+        <li><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"></path></svg><span>不让模型输出挤在窄栏里、旁边留空。</span></li>
+        <li><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"></path></svg><span>不用 emoji、渐变铺底、外部字体或 CDN 资源；图标为内联描边 SVG。</span></li>
+      </ul>
+    </section>
+  </div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":2060}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

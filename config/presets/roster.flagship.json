@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "rootSeat": "claude",
+  "seats": [
+    {"id":"claude","delegationWeight":4,"kind":"lead","promptFile":"claude.md","strengths":"统一用户入口、架构主导、澄清与最终交付；保持一份共同方案。","bindings":{"default":{"model":"claude-fable-5-2","effort":"max","delegation":"explicit"}},"can":{"askUser":true,"delegateSeats":["astra","opus","carbon","sol"],"writeMain":false,"writeIsolated":false,"integrate":false,"acceptance":false,"exec":false}},
+    {"id":"astra","delegationWeight":3,"kind":"secondary","promptFile":"astra.md","strengths":"可行性、风险修正和跨家族独立验收。","bindings":{"default":{"model":"gpt-6.2-astra","effort":"max","delegation":"explicit"},"cluster":{"model":"gpt-6.2-astra","effort":"max","delegation":"proactive"}},"can":{"askUser":false,"delegateSeats":["carbon","sol"],"writeMain":false,"writeIsolated":false,"integrate":false,"acceptance":true,"exec":true}},
+    {"id":"opus","delegationWeight":3,"kind":"crossref","promptFile":"opus.md","strengths":"架构互参、实现计划互签、独立副本实现与交叉评审。","bindings":{"default":{"model":"claude-opus-5-5","effort":"max","delegation":"explicit"},"implementation":{"model":"claude-opus-5-5","effort":"xhigh","delegation":"proactive"}},"can":{"askUser":false,"delegateSeats":["carbon","sol"],"writeMain":false,"writeIsolated":false,"integrate":false,"acceptance":false,"exec":false},"canByPhase":{"implementation":{"writeIsolated":true,"exec":true}}},
+    {"id":"carbon","delegationWeight":2,"kind":"ideator","promptFile":"carbon.md","strengths":"提供多样化思路、适用条件与风险，不作裁决。","bindings":{"default":{"model":"gemini-4-carbon","effort":"high","delegation":"explicit"}},"can":{"askUser":false,"delegateSeats":[],"writeMain":false,"writeIsolated":false,"integrate":false,"acceptance":false,"exec":false}},
+    {"id":"sol","delegationWeight":2,"kind":"builder","promptFile":"sol.md","strengths":"主工作区唯一写者、实现、集成和真实执行。","bindings":{"default":{"model":"gpt-6.2-sol","effort":"max","delegation":"explicit"},"demo":{"model":"gpt-6.2-sol","effort":"max","delegation":"explicit"},"implementation":{"model":"gpt-6.2-sol","effort":"max","delegation":"proactive"}},"can":{"askUser":false,"delegateSeats":[],"writeMain":true,"writeIsolated":false,"integrate":true,"acceptance":false,"exec":true}}
+  ],
+  "pools": [
+    {"id":"grok","delegationWeight":1,"binding":{"model":"grok-4.7","effort":"high","delegation":"none"},"maxConcurrent":64,"maxWindowsPerTask":2,"strengths":"快速、工程化的有界子任务和独立副本编辑。"},
+    {"id":"hydrogen","delegationWeight":1,"binding":{"model":"gemini-4-hydrogen","effort":"high","delegation":"none"},"maxConcurrent":64,"maxWindowsPerTask":2,"strengths":"并行 worker、长上下文分析和校验型子任务。"},
+    {"id":"deepseek","delegationWeight":1,"binding":{"model":"deepseek-v4-pro","effort":"high","delegation":"none"},"maxConcurrent":64,"maxWindowsPerTask":2,"strengths":"实现层代码分析与有界工程子任务。"},
+    {"id":"mini","delegationWeight":1,"binding":{"byParentProvider":{"anthropic":{"model":"claude-haiku-5-5","effort":"medium","delegation":"none"},"openai":{"model":"gpt-6-luna","effort":"medium","delegation":"none"},"google":{"model":"gemini-4-hydrogen","effort":"medium","delegation":"none"}}},"maxConcurrent":64,"maxWindowsPerTask":2,"strengths":"随父席位厂商选择的低成本快速子任务。"}
+  ],
+  "layers":{"architecture":{"pools":["grok","hydrogen","mini"]},"implementation":{"pools":["grok","deepseek","hydrogen"]}}
+}

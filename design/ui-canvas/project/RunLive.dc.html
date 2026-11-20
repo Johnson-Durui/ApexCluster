@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>运行 · 执行过程</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap">
+<style>
+body{margin:0;background:#F2F3F5}
+.wb{--font:"Segoe UI Variable Text","Segoe UI","Microsoft YaHei UI","Microsoft YaHei","PingFang SC","Noto Sans SC",sans-serif;--mono:"Cascadia Mono","Cascadia Code",Consolas,"JetBrains Mono",monospace;--bg:#F2F3F5;--panel:#FFFFFF;--panel-2:#F7F8FA;--surface-3:#EDEFF2;--line:#E0E3E8;--line-2:#C8CDD5;--text:#16191F;--text-2:#3D4450;--muted:#5F6773;--accent:#16191F;--appbar:#14171C;--gate:#4338CA;--gate-ink:#3730A3;--gate-bg:#EEF0FD;--gate-line:#C7CCF5;--claude:#B4532A;--claude-ink:#9A431F;--claude-bg:#FBEEE6;--astra:#1C6B88;--astra-ink:#155A73;--astra-bg:#E5F1F5;--sol:#8A6A06;--sol-ink:#6F5505;--sol-bg:#F6EFD9;--ok:#1D7146;--ok-bg:#E7F3EC;--warn:#975006;--warn-bg:#FBF1E3;--bad:#B42318;--bad-bg:#FDEDEB;--info:#2457A6;--info-bg:#EAF0FA;--radius:8px;--rail-w:340px;font-family:var(--font);font-size:14px;line-height:1.6;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased;position:relative;min-width:0}
+.wb *{box-sizing:border-box}
+.wb sc-for,.wb sc-if{display:contents}
+:where(.wb) a{color:inherit;text-decoration:none}
+:where(.wb) a:hover{color:var(--gate-ink)}
+.wb h1,.wb h2,.wb h3,.wb h4,.wb p{margin-top:0}
+.wb h1{font-size:24px;line-height:1.3;font-weight:700;letter-spacing:-.01em;margin-bottom:6px}
+.wb h2{font-size:16px;line-height:1.4;font-weight:650;margin-bottom:0}
+.wb h3{font-size:14.5px;line-height:1.5;font-weight:650;margin-bottom:0}
+.wb h4{font-size:13px;font-weight:650;margin-bottom:0}
+.wb p{line-height:1.7}
+.wb small{font-size:12.5px;line-height:1.55}
+:where(.wb) ul,:where(.wb) ol{padding-left:20px;line-height:1.75;margin:0}
+.wb code,.wb .mono{font-family:var(--mono);font-size:12.5px;overflow-wrap:anywhere}
+.wb summary{cursor:pointer;font-weight:600;line-height:1.65}
+.muted{color:var(--muted)}
+.small{font-size:12.5px}
+.eyebrow{color:var(--muted);font-size:12px;letter-spacing:.04em;font-weight:600;margin-bottom:4px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.num{font-variant-numeric:tabular-nums}
+.icon{flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle}
+.wb button,.wb .button{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:34px;max-width:100%;padding:6px 13px;border:1px solid var(--line-2);border-radius:6px;background:var(--panel);color:var(--text);font:inherit;font-size:13.5px;font-weight:550;line-height:1.4;cursor:pointer;text-align:center}
+.wb button:hover,.wb .button:hover{background:var(--panel-2);border-color:#A9B0BA;color:var(--text)}
+.wb .primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.wb .primary:hover{background:#2B313B;border-color:#2B313B;color:#fff}
+.wb .gate{background:var(--gate);border-color:var(--gate);color:#fff}
+.wb .gate:hover{background:var(--gate-ink);border-color:var(--gate-ink);color:#fff}
+.wb .danger{color:var(--bad);border-color:#E9C2BD}
+.wb .ghost{background:transparent;border-color:transparent}
+.wb .compact{min-height:28px;padding:3px 9px;font-size:12.5px}
+.wb button:disabled{opacity:.45;cursor:not-allowed}
+.wb input,.wb textarea,.wb select{font:inherit;font-size:14px;padding:8px 10px;min-height:36px;width:100%;min-width:0;border:1px solid var(--line-2);border-radius:6px;background:#fff;color:var(--text)}
+.wb textarea{resize:vertical;min-height:84px;line-height:1.6}
+.wb input[type=checkbox],.wb input[type=radio]{width:16px;min-height:16px;height:16px;padding:0;accent-color:var(--gate);flex:none}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0;font-size:13px;margin-bottom:16px}
+.field>span:first-child{font-weight:600;color:var(--text-2)}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:2px 18px}
+.check-label{display:flex;align-items:center;gap:9px;font-size:13.5px;line-height:1.6;cursor:pointer}
+.row,.btnbar{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.btnbar{margin-top:14px}
+.badge{display:inline-flex;align-items:center;gap:4px;min-height:22px;padding:2px 8px;border:1px solid var(--line);border-radius:4px;background:var(--panel-2);color:var(--text-2);font-size:12px;font-weight:600;line-height:1.35;white-space:nowrap}
+.badge.ok{color:var(--ok);background:var(--ok-bg);border-color:#C4DFCD}
+.badge.warn{color:var(--warn);background:var(--warn-bg);border-color:#EED6B6}
+.badge.bad{color:var(--bad);background:var(--bad-bg);border-color:#F1C5BF}
+.badge.info{color:var(--info);background:var(--info-bg);border-color:#C7D6EE}
+.badge.gate{color:#fff;background:var(--gate);border-color:var(--gate)}
+.badge.gate-soft{color:var(--gate-ink);background:var(--gate-bg);border-color:var(--gate-line)}
+.badge.real{color:var(--text-2);background:var(--panel-2);border-color:var(--line-2)}
+.badge.claude{color:var(--claude-ink);background:var(--claude-bg);border-color:#EBCDBB}
+.badge.astra{color:var(--astra-ink);background:var(--astra-bg);border-color:#BBD9E4}
+.badge.sol{color:var(--sol-ink);background:var(--sol-bg);border-color:#E4D3A3}
+.mtag{display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 5px;border-radius:5px;color:#fff;font-size:11.5px;font-weight:700;line-height:1;flex:none;background:var(--text-2)}
+.mtag.claude{background:var(--claude)}.mtag.astra{background:var(--astra)}.mtag.sol{background:var(--sol)}
+.mtag.ultra{background:#0E3F52;box-shadow:0 0 0 2px #fff,0 0 0 3.5px var(--astra)}
+.alert{display:block;padding:10px 14px;border-radius:6px;border:1px solid var(--line);font-size:13.5px;line-height:1.65;overflow-wrap:anywhere;background:var(--panel-2)}
+.alert.warn{background:var(--warn-bg);color:var(--warn);border-color:#EED6B6}
+.alert.bad{background:var(--bad-bg);color:var(--bad);border-color:#F1C5BF}
+.alert.info{background:var(--info-bg);color:var(--info);border-color:#C7D6EE}
+.help-note{font-size:12.5px;color:var(--muted);line-height:1.65;margin:8px 0}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;min-width:0}
+.section-title{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.section-title>div{min-width:0}
+.section-title .eyebrow{margin-bottom:2px}
+.page-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.page-heading h1{margin-bottom:4px}
+.page-heading p{margin:0;font-size:13.5px}
+.wb .anchor-link{font-size:12.5px;color:var(--gate-ink);text-decoration:underline}
+.table-scroll{position:relative;overflow:auto;max-width:100%}
+.wb table{border-collapse:collapse;width:100%;font-size:13px;text-align:left}
+.wb th,.wb td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.6}
+.wb th{background:var(--panel-2);font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap}
+.wb td{overflow-wrap:anywhere}
+.log{background:#0F1217;color:#D6DAE0;border-radius:6px;padding:10px 12px;font:12px/1.75 var(--mono);white-space:pre-wrap;overflow-wrap:anywhere;margin:0}
+.seg-control{display:inline-flex;flex-wrap:wrap;padding:3px;gap:2px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px}
+.wb .seg-control button{min-height:30px;padding:3px 12px;border:0;border-radius:6px;background:transparent;color:var(--muted);font-size:13px}
+.wb .seg-control button.on{background:var(--text);color:#fff}
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,160px),1fr));gap:14px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px 18px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.stat b{font-size:26px;line-height:1.25;font-weight:700;font-variant-numeric:tabular-nums}
+.stat span{font-size:13px;font-weight:600;color:var(--text-2)}
+.stat small{color:var(--muted)}
+.stat.attention{border-color:var(--gate-line);background:var(--gate-bg)}
+.stat.attention b{color:var(--gate-ink)}
+.stat.warn{border-color:#EED6B6;background:var(--warn-bg)}
+.stat.warn b{color:var(--warn)}
+.gate-section{border:1.5px solid var(--gate);box-shadow:0 0 0 4px var(--gate-bg)}
+.gate-section>.section-title h2{color:var(--gate-ink)}
+.gate-actions{position:sticky;bottom:0;z-index:2;margin:16px -20px -18px;padding:12px 20px;background:#fff;border-top:1px solid var(--line);border-radius:0 0 var(--radius) var(--radius)}
+.empty-symbol{display:inline-grid;place-items:center;width:52px;height:52px;border-radius:12px;background:var(--surface-3);color:var(--muted)}
+
+/* 应用外壳 */
+.app{display:flex;flex-direction:column;min-width:0}
+.app.fixed{height:100vh;min-height:860px}
+.appbar{flex:none;display:flex;align-items:center;gap:28px;min-height:52px;padding:0 24px;background:var(--appbar);color:#E6E8EC;border-bottom:1px solid #000}
+.appbar-brand{display:flex;align-items:center;gap:10px;color:#fff;min-width:0}
+.wb .appbar-brand:hover{color:#fff}
+.appbar-brand b{display:block;font-size:14.5px;font-weight:650;letter-spacing:.01em;white-space:nowrap}
+.appbar-brand small{display:block;font-size:11.5px;color:#9EA5B0;white-space:nowrap}
+.appnav{position:relative;display:flex;align-items:center;gap:2px;flex-wrap:wrap}
+.appnav a{display:inline-flex;align-items:center;gap:7px;min-height:36px;padding:0 12px;border-radius:6px;color:#B7BDC7;font-size:13.5px;font-weight:550}
+.wb .appnav a:hover{color:#fff;background:#232831}
+.appnav a.active{color:#fff;background:#2A303A}
+.appbar-meta{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12.5px;color:#9EA5B0;white-space:nowrap}
+.appbar-dot{width:7px;height:7px;border-radius:50%;background:#4CB27A;box-shadow:0 0 0 3px rgba(76,178,122,.18)}
+.page{display:flex;flex-direction:column;gap:20px;padding:24px 32px 48px;max-width:2400px;margin:0 auto;width:100%;min-width:0}
+
+/* 运行页 */
+.run-page{flex:1;min-height:0;display:flex;flex-direction:column}
+.run-head{flex:none;display:flex;flex-direction:column;gap:10px;padding:12px 24px 10px;background:var(--panel);border-bottom:1px solid var(--line)}
+.run-head-top{display:flex;align-items:center;gap:10px 16px;flex-wrap:wrap}
+.run-title-main{flex:1 1 320px;min-width:0}
+.run-title-main h1{font-size:20px;line-height:1.35;margin:0 0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.run-chips{display:flex;align-items:center;gap:6px 10px;flex-wrap:wrap;font-size:12.5px}
+.run-chips .mono{font-size:12px}
+.run-conn{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;color:var(--muted)}
+.run-conn i{width:7px;height:7px;border-radius:50%;background:var(--ok)}
+.run-head-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;flex:none}
+.wb .run-head-actions button,.wb .run-head-actions .button{min-height:32px;padding:4px 10px;font-size:13px}
+.run-track{position:relative;min-width:0;overflow-x:auto;padding:2px}
+.run-track-compact{display:none}
+.model-strip{display:flex;gap:8px;flex-wrap:wrap;list-style:none;margin:0;padding:0;flex:0 1 auto}
+.wb .ms{position:relative;display:flex;align-items:center;gap:8px;justify-content:flex-start;min-width:172px;max-width:240px;min-height:40px;padding:4px 10px;border-radius:8px;background:var(--panel-2);border:1px solid var(--line);text-align:left;font-weight:400}
+.ms-text{display:flex;flex-direction:column;min-width:0}
+.ms-text b{font-size:13px;font-weight:650;line-height:1.3}
+.ms-text small{font-size:12px;color:var(--muted);line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wb .ms.running{border-color:#BFD0EC;background:var(--info-bg)}
+.ms.running .ms-text small{color:var(--info)}
+.ms-live{position:absolute;top:7px;right:8px;width:7px;height:7px;border-radius:50%;background:var(--ok)}
+.gate-track{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:minmax(84px,1fr) auto minmax(150px,1.7fr) auto minmax(104px,1.1fr) auto minmax(80px,.9fr) auto minmax(76px,.85fr) auto minmax(44px,.45fr);align-items:start;column-gap:8px;min-width:820px}
+.gt{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:66px;text-align:center}
+.gt-node{display:grid;place-items:center;min-width:40px;height:28px;padding:0 8px;border-radius:6px;border:1.5px solid var(--line-2);background:#fff;color:var(--muted);font-size:12.5px;font-weight:700}
+.gt-label{font-size:12px;font-weight:600;color:var(--text-2);line-height:1.3;white-space:nowrap}
+.gt-state{font-size:11px;color:var(--muted);line-height:1.2}
+.gt.done .gt-node{background:var(--text);border-color:var(--text);color:#fff}
+.gt.now .gt-node{background:var(--gate);border-color:var(--gate);color:#fff;box-shadow:0 0 0 4px var(--gate-bg)}
+.gt.now .gt-label,.gt.now .gt-state{color:var(--gate-ink);font-weight:700}
+.gt.stopped .gt-node{border-color:var(--bad);color:var(--bad);background:var(--bad-bg)}
+.gt.stopped .gt-label,.gt.stopped .gt-state{color:var(--bad);font-weight:700}
+.gt.off .gt-node{border-style:dashed;background:transparent;color:#9AA1AB}
+.gt.off .gt-label{color:#9AA1AB}
+.gs{display:flex;flex-direction:column;gap:6px;padding-top:13px;min-width:0}
+.gs-bar{display:block;height:3px;border-radius:3px;background:var(--line-2);overflow:hidden}
+.gs-bar i{display:block;height:100%;background:var(--text)}
+.gs.now .gs-bar i{background:var(--gate)}
+.gs.blocked .gs-bar i{background:var(--bad)}
+.gs.off .gs-bar{background:transparent;border-top:2px dashed var(--line-2);height:0}
+.gs-steps{display:flex;justify-content:space-between;gap:6px;flex-wrap:wrap;font-size:11.5px;line-height:1.35}
+.gs-step{color:var(--muted);white-space:nowrap}
+.gs-step.done{color:var(--text-2)}
+.gs-step.now{color:var(--gate-ink);font-weight:700}
+.gs-step.blocked{color:var(--bad);font-weight:700}
+.gs-step.off{color:#9AA1AB}
+.gs-loop{display:inline-flex;align-items:center;gap:5px;flex-wrap:wrap;font-size:11px;color:var(--muted);line-height:1.3}
+.gs-loop.active{color:var(--gate-ink)}
+.gate-pips{display:inline-flex;gap:3px}
+.gp{display:inline-grid;place-items:center;width:28px;height:20px;border-radius:4px;border:1px solid var(--line-2);background:#fff;color:var(--muted);font-size:10.5px;font-weight:700;line-height:1}
+.gp.done{background:var(--text);border-color:var(--text);color:#fff}
+.gp.now{background:var(--gate);border-color:var(--gate);color:#fff}
+.gp.blocked{background:var(--bad);border-color:var(--bad);color:#fff}
+.gp.stopped{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+.gp.off{border-style:dashed;background:transparent;color:#A3A9B2}
+.blocked-bar{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:6px;font-size:13.5px;background:var(--bad-bg);border:1px solid #F1C5BF;color:var(--bad);flex-wrap:wrap}
+.blocked-bar>div:nth-child(2){flex:1 1 280px;min-width:0}
+.blocked-bar p{margin:2px 0 0;color:var(--text-2)}
+.run-body{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) var(--rail-w)}
+.run-main{min-width:0;min-height:0;display:flex;flex-direction:column}
+.run-tabs{position:relative;flex:none;display:flex;gap:2px;padding:0 20px;background:var(--panel);border-bottom:1px solid var(--line);overflow-x:auto}
+.wb .run-tabs a{flex:none;display:inline-flex;align-items:center;gap:6px;border-bottom:2px solid transparent;min-height:44px;padding:0 13px;color:var(--muted);font-weight:600;font-size:13.5px;white-space:nowrap}
+.wb .run-tabs a:hover{color:var(--text)}
+.wb .run-tabs a.on{color:var(--text);border-bottom-color:var(--text)}
+.tab-count{min-width:20px;height:18px;padding:0 6px;border-radius:9px;background:var(--surface-3);color:var(--text-2);font-size:11.5px;line-height:18px;text-align:center}
+.tab-dot{width:7px;height:7px;border-radius:50%;background:var(--gate)}
+.tab-live{width:7px;height:7px;border-radius:50%;background:var(--ok)}
+.run-pane{flex:1;min-height:0;padding:20px 24px 28px;display:flex;flex-direction:column;gap:16px}
+.app.fixed .run-pane{overflow:auto;padding-bottom:20px}
+.run-rail{min-height:0;background:var(--panel-2);border-left:1px solid var(--line);padding:16px;display:flex;flex-direction:column;gap:14px}
+.app.fixed .run-rail{overflow:auto}
+.rail-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.rail-card p{margin:0;font-size:13.5px;color:var(--text-2)}
+.rail-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.rail-head h2{font-size:14.5px;margin:0;flex:1 1 auto;min-width:0}
+.rail-head .mono{font-size:11.5px}
+.rail-card.is-gate{border:1.5px solid var(--gate);background:linear-gradient(var(--gate-bg),var(--gate-bg)) top/100% 4px no-repeat,var(--panel)}
+.rail-card.is-gate h2{color:var(--gate-ink)}
+.rail-card.running{border-color:#BFD0EC}
+.rail-card>.button,.rail-card>button{align-self:flex-start}
+.rail-live{width:8px;height:8px;border-radius:50%;background:var(--ok);flex:none}
+.rail-tasks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.rail-tasks li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:8px;font-size:13px}
+.rail-note{font-size:12.5px;color:var(--info)}
+.rail-questions{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.wb .rail-questions a{display:flex;width:100%;justify-content:flex-start;align-items:flex-start;gap:8px;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--panel-2);text-align:left;font-size:13px}
+.rail-questions .mono{font-size:12px;color:var(--muted);flex:none;line-height:1.55}
+.rail-q-text{flex:1;min-width:0;line-height:1.5}
+.wb .rail-link{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;color:var(--gate-ink);font-size:13px;font-weight:550}
+.rail-counts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;margin:0;background:var(--line);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.rail-counts div{background:var(--panel-2);padding:6px 8px;text-align:center}
+.rail-counts dt{font-size:11.5px;color:var(--muted)}
+.rail-counts dd{margin:0;font-size:15px;font-weight:700}
+.rail-constraints{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;font-size:13px}
+.rail-constraints li{display:flex;gap:8px;align-items:flex-start}
+.rail-models{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.rail-models li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;font-size:12.5px}
+.rail-kv{display:grid;grid-template-columns:auto minmax(0,1fr);gap:5px 12px;margin:0;font-size:12.5px}
+.rail-kv dt{color:var(--muted)}
+.rail-kv dd{margin:0;overflow-wrap:anywhere}
+
+@media(min-width:1600px){.wb{--rail-w:380px}}
+@media(max-width:1099px){
+  .app.fixed{height:auto;min-height:0}
+  .run-body{display:block}
+  .run-pane,.app.fixed .run-pane{overflow:visible;padding:18px 20px 28px}
+  .run-rail{border-left:0;border-top:1px solid var(--line)}
+  .gate-actions{position:static;margin:16px 0 0;padding:12px 0 0;border-radius:0}
+}
+@media(max-width:900px){.wb .ms{min-width:0;max-width:none;width:100%}.model-strip{flex:1 1 100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:760px){
+  .appbar{gap:12px;padding:8px 16px;flex-wrap:wrap}
+  .appbar-brand small,.appbar-meta{display:none}
+  .appnav{width:100%;overflow-x:auto;flex-wrap:nowrap}
+  .page{padding:18px 16px 36px}
+  .run-head{padding:10px 16px 12px}
+  .run-title-main h1{white-space:normal}
+  .run-head-actions{justify-content:flex-start}
+  .run-track{display:none}
+  .run-track-compact{display:flex;align-items:center;gap:8px}
+  .run-tabs{padding:0 8px}
+  .run-pane,.app.fixed .run-pane{padding:16px}
+  .panel{padding:16px}
+  .wb h1{font-size:21px}
+  .stat b{font-size:22px}
+}
+
+.live{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:10px}
+.live-head{display:flex;align-items:center;justify-content:space-between;gap:10px 24px;flex-wrap:wrap}
+.live-title{flex:1 1 320px;min-width:0}
+.live-title h2{font-size:18px;margin:0 0 2px}
+.live-title p{margin:0;color:var(--muted);font-size:13px;max-width:900px}
+.live-stats{display:flex;gap:8px;flex-wrap:wrap;margin:0}
+.live-stats div{display:flex;align-items:baseline;gap:6px;padding:3px 11px;border:1px solid var(--line);border-radius:999px;background:var(--panel)}
+.live-stats dt{font-size:12px;color:var(--muted)}
+.live-stats dd{margin:0;font-size:14px;font-weight:700;line-height:1.5}
+.live-stages{position:relative;display:flex;gap:6px;flex-wrap:wrap;flex:0 1 auto}
+.wb .stage-btn{min-height:32px;padding:4px 12px;border-radius:999px;font-size:13px;font-weight:550;gap:7px}
+.wb .stage-btn.active{background:var(--text);border-color:var(--text);color:#fff}
+.stage-dot{width:8px;height:8px;border-radius:50%;background:var(--line-2);flex:none}
+.stage-btn.done .stage-dot{background:var(--ok)}
+.stage-btn.running .stage-dot{background:#4C8FE8}
+.live-grid{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.live-pane{position:relative;min-width:0;min-height:420px;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.live-pane.running{border-color:#BFD0EC}
+.lp-progress{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#4C8FE8,transparent) no-repeat;background-size:40% 100%;background-position:30% 0}
+.lp-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;border-bottom:1px solid var(--line)}
+.lp-title{display:flex;flex-direction:column;flex:1 1 160px;min-width:0}
+.lp-title b{font-size:14.5px;line-height:1.35}
+.lp-title small{color:var(--muted)}
+.lp-badges{display:flex;gap:6px;flex-wrap:wrap}
+.lp-metrics{display:flex;flex-wrap:wrap;gap:4px 18px;margin:0;padding:8px 14px;background:var(--panel-2);border-bottom:1px solid var(--line)}
+.lp-metrics div{display:flex;align-items:baseline;gap:6px;min-width:0}
+.lp-metrics dt{font-size:12px;color:var(--muted);white-space:nowrap}
+.lp-metrics dd{margin:0;font-size:13px;font-weight:650;overflow-wrap:anywhere}
+.lp-metrics dd.mono{font-size:12.5px;font-weight:500}
+.lp-metrics dd.warn{color:var(--warn)}
+.lp-metrics dd small{font-weight:400;color:var(--muted)}
+.lp-log-head{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:10px 14px 6px;font-size:12px;font-weight:600;color:var(--text-2)}
+.lp-log-head .muted{font-weight:400}
+.lp-log{position:relative;flex:1 1 auto;min-height:200px;margin:0 14px 12px;padding:8px 0;list-style:none;overflow:auto;background:#0F1217;border-radius:6px;color:#D6DAE0;font:12px/1.7 var(--mono)}
+.lp-log li{display:grid;grid-template-columns:64px 58px minmax(0,1fr);gap:8px;padding:1px 12px}
+.lp-log time{color:#7D8590}
+.lp-kind{color:#9FB3C8;font-family:var(--font);font-size:11.5px}
+.lp-text{overflow-wrap:anywhere;white-space:pre-wrap}
+.k-tool .lp-kind{color:#E8C27A}
+.k-retry .lp-kind{color:#F49C92}
+.k-started .lp-kind{color:#8FD0A8}
+.k-usage .lp-kind{color:#A9C4F5}
+.k-message .lp-kind{color:#C9B6F2}
+.lp-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:9px 14px;border-top:1px solid var(--line);background:var(--panel-2)}
+@media(max-width:1099px){.live-grid{grid-template-columns:minmax(0,1fr)}.live-pane{min-height:0}.lp-log{max-height:420px}}
+@media(max-width:760px){.lp-log li{grid-template-columns:58px minmax(0,1fr)}.lp-log .lp-kind{display:none}}
+@media(max-height:860px){.live-title p,.live-title .eyebrow{display:none}}
+</style>
+</helmet>
+<div class="wb app fixed">
+<header class="appbar">
+  <a href="Main.dc.html" class="appbar-brand"><svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#2A303A"></rect><path d="M7.5 9.5 16 16" stroke="#E0784B" stroke-width="2.6" stroke-linecap="round"></path><path d="M7.5 22.5 16 16" stroke="#5DB4D2" stroke-width="2.6" stroke-linecap="round"></path><path d="M22 8.5v15" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round"></path></svg><span><b>双模型架构工作台</b><small>Claude · Astra 设计评审 · Sol 构建验证</small></span></a>
+  <nav class="appnav" aria-label="主导航"><a href="Main.dc.html" class="active"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h.01M3 18h.01M3 6h.01M8 12h13M8 18h13M8 6h13"></path></svg>运行列表</a><a href="New.dc.html"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>新建评审</a><a href="Env.dc.html"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path></svg>环境检查</a></nav>
+  <div class="appbar-meta"><span class="appbar-dot" aria-hidden="true"></span>本机服务 · 仅监听 127.0.0.1</div>
+</header>
+<main class="run-page">
+<section class="run-head" aria-labelledby="run-title">
+  <div class="run-head-top">
+    <div class="run-title-main">
+      <h1 id="run-title">本地个人记账与预算工具</h1>
+      <div class="run-chips"><span class="badge real">真实运行</span><span class="badge info">独立提案 · 进行中</span><span class="mono muted">r-20261012-3ee667</span><span class="muted">更新于 10/12 14:47</span><span class="run-conn" role="status"><i></i>实时同步</span></div>
+    </div>
+    <ul class="model-strip" aria-label="模型任务状态"><li><a href="RunLive.dc.html" class="ms running" aria-label="Claude：独立提案 · 进行中 4 分 12 秒，查看执行过程"><span class="mtag claude">C</span><span class="ms-text"><b>Claude</b><small>独立提案 · 进行中 4 分 12 秒</small></span><span class="ms-live" aria-hidden="true"></span></a></li><li><a href="RunLive.dc.html" class="ms running" aria-label="Astra：独立提案 · 进行中 4 分 2 秒，查看执行过程"><span class="mtag astra">A</span><span class="ms-text"><b>Astra</b><small>独立提案 · 进行中 4 分 2 秒</small></span><span class="ms-live" aria-hidden="true"></span></a></li><li><a href="RunLive.dc.html" class="ms" aria-label="Sol：尚未启动 · gpt-6.1-sol，查看执行过程"><span class="mtag sol">S</span><span class="ms-text"><b>Sol</b><small>尚未启动 · gpt-6.1-sol</small></span></a></li></ul>
+    <div class="run-head-actions"><button type="button"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M10 9H8M16 13H8M16 17H8"></path></svg>快照 v2</button><a class="button" href="#"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="m7 10 5 5 5-5"></path><path d="M12 15V3"></path></svg>导出</a><button type="button" class="danger"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="1.5"></rect></svg>取消运行</button></div>
+  </div>
+  <div class="run-track"><ol class="gate-track" aria-label="运行进度"><li class="gs done"><span class="gs-bar" aria-hidden="true"><i style="width: 100%"></i></span><span class="gs-steps"><span class="gs-step done">录入需求</span><span class="gs-step done">澄清提问</span></span></li><li class="gt done"><span class="gt-node"><svg class="icon" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg></span><span class="gt-label">G1 回答问题</span><span class="gt-state">已完成</span></li><li class="gs now"><span class="gs-bar" aria-hidden="true"><i style="width: 25%"></i></span><span class="gs-steps"><span class="gs-step now">独立提案<span class="sr-only">（进行中）</span></span><span class="gs-step todo">交叉评审</span></span><span class="gs-loop"><svg class="icon" width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg><span class="gs-step todo">复核分歧</span><span class="gs-step todo">Ultra 裁决</span><span class="muted">按需</span></span></li><li class="gt todo"><span class="gt-node">G2</span><span class="gt-label">确认框架</span><span class="gt-state">未开始</span></li><li class="gs todo"><span class="gs-bar" aria-hidden="true"><i style="width: 0%"></i></span><span class="gs-steps"><span class="gs-step todo">手册与开发文档</span></span></li><li class="gt todo"><span class="gt-node">G3</span><span class="gt-label">确认文档</span><span class="gt-state">未开始</span></li><li class="gs todo"><span class="gs-bar" aria-hidden="true"><i style="width: 0%"></i></span><span class="gs-steps"><span class="gs-step todo">Sol 构建</span></span></li><li class="gt todo"><span class="gt-node">G4</span><span class="gt-label">验收 MVP</span><span class="gt-state">未开始</span></li><li class="gs todo"><span class="gs-bar" aria-hidden="true"><i style="width: 0%"></i></span><span class="gs-steps"><span class="gs-step todo">PRD 撰写</span></span></li><li class="gt todo"><span class="gt-node">G5</span><span class="gt-label">确认 PRD</span><span class="gt-state">未开始</span></li><li class="gs todo"><span class="gs-bar" aria-hidden="true"><i style="width: 0%"></i></span><span class="gs-steps"><span class="gs-step todo">结束</span></span></li></ol></div>
+  <div class="run-track-compact"><span class="gate-pips" role="img" aria-label="关卡进度：G1已完成，G2未开始，G3未开始，G4未开始，G5未开始"><span class="gp done">G1</span><span class="gp todo">G2</span><span class="gp todo">G3</span><span class="gp todo">G4</span><span class="gp todo">G5</span></span></div>
+</section>
+<div class="run-body">
+  <div class="run-main">
+    <nav class="run-tabs" aria-label="运行详情"><a href="RunLive.dc.html" class="on" aria-current="page"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"></path></svg>执行过程<span class="tab-live" aria-hidden="true"></span><span class="sr-only">（进行中）</span></a><a href="RunG1.dc.html"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>澄清问题</a><a href="RunProposals.dc.html"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"></path><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"></path><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"></path></svg>架构方案</a><a href="RunCompare.dc.html"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"></path><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"></path><path d="M7 21h10M12 3v18"></path><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"></path></svg>评审对比</a><a href="RunG2.dc.html"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 22V4"></path><path d="M4 4h12l-2 4 2 4H4"></path></svg>框架决策</a><a href="RunG3.dc.html"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M10 9H8M16 13H8M16 17H8"></path></svg>项目文档</a><a href="RunG4.dc.html"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="m4 17 6-6-6-6"></path><path d="M12 19h8"></path></svg>MVP 验证</a><a href="#"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h.01M3 18h.01M3 6h.01M8 12h13M8 18h13M8 6h13"></path></svg>决策记录</a></nav>
+    <div class="run-pane" role="tabpanel" aria-label="执行过程">
+<div class="live">
+  <header class="live-head">
+    <div class="live-title"><div class="eyebrow">执行过程 · 当前阶段</div><h2>独立提案</h2><p>Claude 与 Astra 各自独立设计 1–3 个方案，彼此看不到对方的内容。</p></div>
+    <div class="live-stages" role="group" aria-label="选择执行阶段"><button type="button" class="stage-btn done" aria-pressed="false"><span class="stage-dot" aria-hidden="true"></span>澄清提问</button><button type="button" class="stage-btn running active" aria-pressed="true"><span class="stage-dot" aria-hidden="true"></span>独立提案<span class="sr-only">（当前阶段）</span></button></div>
+    <dl class="live-stats"><div><dt>任务</dt><dd class="num">2</dd></div><div><dt>进行中</dt><dd class="num">2</dd></div><div><dt>已完成</dt><dd class="num">0</dd></div><div><dt>未完成</dt><dd class="num">0</dd></div><div><dt>阶段用时</dt><dd class="num">4 分 12 秒</dd></div></dl>
+  </header>
+  <div class="live-grid">
+<article class="live-pane running" aria-label="Claude · 独立提案">
+  <span class="lp-progress" aria-hidden="true"></span>
+  <header class="lp-head"><span class="mtag claude">C</span><div class="lp-title"><b>Claude</b><small>独立提案</small></div><div class="lp-badges"><span class="badge info">进行中</span><span class="badge">待校验</span></div></header>
+  <dl class="lp-metrics">
+    <div><dt>用时</dt><dd class="num">4 分 12 秒</dd></div>
+    <div><dt>工具调用</dt><dd class="num">3</dd></div>
+    <div><dt>接口重试</dt><dd class="num">0</dd></div>
+    <div><dt>推理 tokens（估计）</dt><dd class="num">18,432</dd></div>
+    <div><dt>请求型号 · 强度</dt><dd class="mono">claude-opus-5-5 · max</dd></div>
+    <div><dt>执行端型号</dt><dd>claude-opus-5-5<small> · 初始化事件</small></dd></div>
+  </dl>
+  <div class="lp-log-head"><span>实时日志</span><span class="muted">13 条事件 · 最近 10/12 14:47</span></div>
+  <ol class="lp-log" aria-label="Claude 实时日志" tabindex="0"><li class="k-started"><time>14:43:02</time><span class="lp-kind">启动</span><span class="lp-text">会话已启动（claude-opus-5-5 · max）</span></li><li class="k-info"><time>14:43:04</time><span class="lp-kind">进度</span><span class="lp-text">读取需求快照 v2-1371a6dad34d 与 6 条回答</span></li><li class="k-usage"><time>14:43:11</time><span class="lp-kind">用量</span><span class="lp-text">推理中（估计已生成 1,536 tokens，非最终用量）</span></li><li class="k-tool"><time>14:43:23</time><span class="lp-kind">工具</span><span class="lp-text">调用 WebFetch: https://nodejs.org/api/sqlite.html</span></li><li class="k-tool"><time>14:43:41</time><span class="lp-kind">工具</span><span class="lp-text">调用 WebSearch: better-sqlite3 Windows prebuilt binaries</span></li><li class="k-usage"><time>14:44:02</time><span class="lp-kind">用量</span><span class="lp-text">推理中（估计已生成 6,144 tokens，非最终用量）</span></li><li class="k-message"><time>14:44:20</time><span class="lp-kind">输出</span><span class="lp-text">候选 1：本地 Node 服务 + SQLite + React 单页</span></li><li class="k-tool"><time>14:44:48</time><span class="lp-kind">工具</span><span class="lp-text">调用 WebFetch: https://vite.dev/guide/</span></li><li class="k-usage"><time>14:45:10</time><span class="lp-kind">用量</span><span class="lp-text">推理中（估计已生成 11,264 tokens，非最终用量）</span></li><li class="k-message"><time>14:45:36</time><span class="lp-kind">输出</span><span class="lp-text">正在写模块划分与数据流</span></li><li class="k-usage"><time>14:46:12</time><span class="lp-kind">用量</span><span class="lp-text">推理中（估计已生成 15,872 tokens，非最终用量）</span></li><li class="k-message"><time>14:46:40</time><span class="lp-kind">输出</span><span class="lp-text">正在写取舍、风险与假设</span></li><li class="k-usage"><time>14:47:14</time><span class="lp-kind">用量</span><span class="lp-text">推理中（估计已生成 18,432 tokens，非最终用量）</span></li></ol>
+  <footer class="lp-foot"><span class="mono muted" title="本任务读取的输入版本">v2-1371a6dad34d</span><div class="row"><button type="button" class="compact"><svg class="icon" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="1.5"></rect></svg>取消任务</button></div></footer>
+</article>
+<article class="live-pane running" aria-label="Astra · 独立提案">
+  <span class="lp-progress" aria-hidden="true"></span>
+  <header class="lp-head"><span class="mtag astra">A</span><div class="lp-title"><b>Astra</b><small>独立提案</small></div><div class="lp-badges"><span class="badge info">进行中</span><span class="badge">待校验</span></div></header>
+  <dl class="lp-metrics">
+    <div><dt>用时</dt><dd class="num">4 分 2 秒</dd></div>
+    <div><dt>工具调用</dt><dd class="num">2</dd></div>
+    <div><dt>接口重试</dt><dd class="num warn">1</dd></div>
+    <div><dt>推理 tokens（估计）</dt><dd class="num">16,640</dd></div>
+    <div><dt>请求型号 · 强度</dt><dd class="mono">gpt-6-astra · max</dd></div>
+    <div><dt>执行端型号</dt><dd>gpt-6-astra<small> · 初始化事件</small></dd></div>
+  </dl>
+  <div class="lp-log-head"><span>实时日志</span><span class="muted">12 条事件 · 最近 10/12 14:47</span></div>
+  <ol class="lp-log" aria-label="Astra 实时日志" tabindex="0"><li class="k-started"><time>14:43:09</time><span class="lp-kind">启动</span><span class="lp-text">会话已启动（gpt-6-astra · max）</span></li><li class="k-info"><time>14:43:12</time><span class="lp-kind">进度</span><span class="lp-text">读取需求快照 v2-1371a6dad34d 与 6 条回答</span></li><li class="k-tool"><time>14:43:30</time><span class="lp-kind">工具</span><span class="lp-text">执行检索：FastAPI Jinja2 templates SQLite</span></li><li class="k-retry"><time>14:43:52</time><span class="lp-kind">重试</span><span class="lp-text">接口返回 429，12 秒后重试（第 1 次）</span></li><li class="k-usage"><time>14:44:06</time><span class="lp-kind">用量</span><span class="lp-text">推理中（估计已生成 4,096 tokens，非最终用量）</span></li><li class="k-tool"><time>14:44:31</time><span class="lp-kind">工具</span><span class="lp-text">执行检索：htmx partial updates charts</span></li><li class="k-message"><time>14:44:58</time><span class="lp-kind">输出</span><span class="lp-text">候选 1：Python FastAPI + SQLite + 服务端渲染（HTMX）</span></li><li class="k-usage"><time>14:45:22</time><span class="lp-kind">用量</span><span class="lp-text">推理中（估计已生成 9,728 tokens，非最终用量）</span></li><li class="k-message"><time>14:45:50</time><span class="lp-kind">输出</span><span class="lp-text">正在比较 CSV 导入的去重策略</span></li><li class="k-usage"><time>14:46:27</time><span class="lp-kind">用量</span><span class="lp-text">推理中（估计已生成 13,824 tokens，非最终用量）</span></li><li class="k-message"><time>14:46:55</time><span class="lp-kind">输出</span><span class="lp-text">正在写 MVP 计划与验收建议</span></li><li class="k-usage"><time>14:47:11</time><span class="lp-kind">用量</span><span class="lp-text">推理中（估计已生成 16,640 tokens，非最终用量）</span></li></ol>
+  <footer class="lp-foot"><span class="mono muted" title="本任务读取的输入版本">v2-1371a6dad34d</span><div class="row"><button type="button" class="compact"><svg class="icon" width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="1.5"></rect></svg>取消任务</button></div></footer>
+</article>
+  </div>
+</div>
+    </div>
+  </div>
+  <aside class="run-rail" aria-label="运行上下文">
+<section class="rail-card running" aria-labelledby="rail-next"><div class="rail-head"><span class="rail-live" aria-hidden="true"></span><h2 id="rail-next">正在进行 · 独立提案</h2></div><ul class="rail-tasks"><li><span class="mtag claude">C</span><span>Claude · 独立提案</span><span class="muted num">4 分 12 秒</span></li><li><span class="mtag astra">A</span><span>Astra · 独立提案</span><span class="muted num">4 分 2 秒</span></li></ul><a class="button" href="RunLive.dc.html">查看执行过程<svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"></path></svg></a></section>
+<section class="rail-card" aria-labelledby="rail-questions"><div class="rail-head"><h2 id="rail-questions">澄清问题</h2><span class="badge ok">共 6 题 · 已处理</span></div><p class="muted">全部问题已回答或采用默认。</p><a class="rail-link" href="RunG1.dc.html">查看全部问题<svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"></path></svg></a></section>
+<section class="rail-card" aria-labelledby="rail-snapshot"><div class="rail-head"><h2 id="rail-snapshot">需求快照 v2</h2><span class="mono muted">v2-1371a6dad34d</span></div><dl class="rail-counts"><div><dt>事实</dt><dd>3</dd></div><div><dt>假设</dt><dd>6</dd></div><div><dt>待确认</dt><dd>0</dd></div><div><dt>参考资料</dt><dd>0</dd></div></dl><ul class="rail-constraints"><li><span class="badge info">H1 必须</span><span>数据必须只保存在本机</span></li><li><span class="badge warn">H2 禁止</span><span>不得要求 Docker 或外部数据库</span></li></ul><a class="rail-link" href="#">查看完整快照<svg class="icon" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"></path></svg></a></section>
+<section class="rail-card" aria-labelledby="rail-settings"><div class="rail-head"><h2 id="rail-settings">运行配置</h2><span class="muted small">创建时冻结</span></div><ul class="rail-models"><li><span class="mtag claude">C</span><span class="mono">claude-opus-5-5</span><span class="badge">max</span></li><li><span class="mtag astra">A</span><span class="mono">gpt-6-astra</span><span class="badge">max</span></li><li><span class="mtag sol">S</span><span class="mono">gpt-6.1-sol</span><span class="badge">max</span></li></ul><dl class="rail-kv"><dt>澄清提问</dt><dd>两边都提问</dd><dt>设计联网</dt><dd>允许</dd><dt>构建前文档</dt><dd>开启</dd><dt>PRD</dt><dd>开启</dd><dt>文档撰写者</dt><dd class="mono">claude-opus-5-5 · xhigh</dd><dt>评分权重</dt><dd>需求适配 30%、开发与维护成本 25%、可靠性与可验证性 25%、性能与资源成本 10%、后续演进 10%</dd></dl></section>
+  </aside>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":960}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

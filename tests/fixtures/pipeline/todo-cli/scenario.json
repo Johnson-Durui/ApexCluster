@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "preset": "flagship",
+  "cluster": {
+    "mode": "full",
+    "crossRounds": 1
+  },
+  "requirements": [
+    {
+      "id": "R-001",
+      "text": "模拟数据：用户可以新增待办"
+    },
+    {
+      "id": "R-002",
+      "text": "模拟数据：用户可以按创建顺序列出待办"
+    }
+  ],
+  "acceptance": [
+    {
+      "id": "AC-001",
+      "requirementIds": ["R-001"],
+      "kind": "command",
+      "description": "模拟数据：add 命令退出码为 0 并打印新增项",
+      "command": "node demo/cli.mjs add first"
+    },
+    {
+      "id": "AC-002",
+      "requirementIds": ["R-002"],
+      "kind": "command",
+      "description": "模拟数据：list 命令退出码为 0 并按创建顺序打印 JSON 数组",
+      "command": "node demo/cli.mjs list"
+    }
+  ],
+  "expectedArtifacts": [
+    "PRD.md",
+    "ARCHITECTURE.md",
+    "DEV_GUIDE.md",
+    "DEMO_REPORT.md",
+    "CONTRACT.json"
+  ]
+}

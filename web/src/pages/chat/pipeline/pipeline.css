@@ -1,0 +1,71 @@
+/* Pipeline rail (68px row in the map pane, 40px band in the thread) and the read-only PipelineStatus summary.
+   Transitions run only under [data-animate] (a live change), so a loaded or reconciled state never animates. */
+.pipe-rail{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;height:var(--rail-h);padding:0 16px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.72);overflow:hidden;container-type:inline-size}
+.pipe-rail.is-compact{height:var(--strip-h);padding:0 var(--gutter);background:var(--pane)}
+.pipe-rail.is-preview .pipe-nodes{opacity:.6}
+.pipe-rail.is-preview .knob{border-style:dashed}
+.pipe-nodes{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));align-items:center;margin:0;padding:0;list-style:none;min-width:0}
+.pnode{position:relative;display:grid;grid-template-rows:22px auto auto;justify-items:start;min-width:0;padding-right:6px}
+/* The gate button spans the node's three rows (knob, label, status) and packs its grid to the start (a button centres
+   its content by default), so its knob and label line up with the other nodes'. */
+.pnode-hit{display:grid;grid-row:1/-1;grid-template-rows:22px auto auto;justify-items:start;justify-content:start;align-content:start;align-self:start;min-width:0;width:100%;border-radius:var(--r1);color:inherit;text-align:left}
+.pnode-hit:focus-visible{outline-offset:2px}
+.knob{position:relative;z-index:1;display:grid;place-items:center;width:20px;height:20px;border:1.5px solid var(--line-3);border-radius:50%;background:var(--surface)}
+.pnode.is-gate .knob{border-radius:3px;transform:rotate(45deg) scale(.86)}
+.knob .fill{position:absolute;inset:-1.5px;border-radius:inherit;background:var(--ok);transform:scale(0)}
+.knob svg{position:relative;width:12px;height:12px;fill:none;stroke:var(--on-dark);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;opacity:0}
+.pnode.is-gate .knob svg{transform:rotate(-45deg)}
+.knob svg path{stroke-dasharray:14;stroke-dashoffset:14}
+.pnode.done .knob{border-color:var(--ok)}
+.pnode.done .knob .fill{transform:scale(1)}
+.pnode.done .knob svg{opacity:1}
+.pnode.done .knob svg path{stroke-dashoffset:0}
+.pnode.now .knob{border-width:2px;border-color:var(--run)}
+.pnode.now .knob::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--run)}
+.pnode.you .knob{border-width:2px;border-color:var(--gate-ink);background:var(--gate-bg)}
+.pnode.you .knob::after{content:"";width:7px;height:7px;border-radius:1px;background:var(--gate-ink)}
+.pnode.you .knob .ring{position:absolute;inset:-6px;border:1.5px solid var(--gate);border-radius:4px;pointer-events:none}
+.pnode.err .knob{border-color:var(--err)}
+.pnode.held .knob{border-color:var(--err)}
+.pnode.stop{opacity:.6}
+.pnode b{display:block;max-width:100%;margin-top:5px;overflow:hidden;font-size:var(--fs-ui);font-weight:600;line-height:1.2;text-overflow:ellipsis;white-space:nowrap}
+.pnode b small{margin-left:5px;color:var(--muted);font:400 var(--fs-meta) var(--mono)}
+.pnode .roll{display:block;height:18px;overflow:hidden}
+.pnode .st{font-size:var(--fs-meta)}
+.pnode .edge{position:absolute;left:26px;right:4px;top:10px;height:0;border-top:1.5px dashed var(--line-3);pointer-events:none}
+.pnode .edge i{position:absolute;left:0;right:0;top:-1.5px;height:1.5px;background:var(--ok);transform:scaleX(0);transform-origin:left}
+.pnode.done .edge{border-top-color:transparent}
+.pnode.done .edge i{transform:scaleX(1)}
+.pnode.now .edge{border-top-style:solid;border-top-color:var(--line-2)}
+/* live transition only (§7 row 9): fill → tick → edge → next node */
+.pipe-rail[data-animate] .knob .fill{transition:transform 240ms var(--ease-out)}
+.pipe-rail[data-animate] .knob svg path{transition:stroke-dashoffset 180ms var(--ease-pop) 240ms}
+.pipe-rail[data-animate] .pnode .edge i{transition:transform 320ms var(--ease-out) 320ms}
+.pipe-read{display:grid;justify-items:end;gap:1px;padding-left:10px;border-left:1px solid var(--line);color:var(--ink-2);font-size:var(--fs-meta);white-space:nowrap}
+.pipe-read b{color:var(--ink);font-weight:600}
+.pipe-sweep{position:absolute;left:0;top:0;bottom:0;width:30%;background:linear-gradient(90deg,rgba(29,113,70,0),rgba(29,113,70,.12),rgba(29,113,70,0));opacity:0;pointer-events:none}
+/* compact band: one row, knob + label, the status word stays for screen readers */
+.pipe-rail.is-compact{grid-template-columns:minmax(0,1fr)}
+.pipe-rail.is-compact .pnode,.pipe-rail.is-compact .pnode-hit{grid-template-rows:none;grid-template-columns:auto auto minmax(0,1fr);align-items:center;column-gap:6px}
+.pipe-rail.is-compact .pnode .roll{justify-self:start}
+.pipe-rail.is-compact .knob{width:14px;height:14px}
+.pipe-rail.is-compact .knob svg{width:9px;height:9px}
+.pipe-rail.is-compact .pnode b{margin:0;font-size:12px}
+.pipe-rail.is-compact .pnode .roll{height:auto}
+.pipe-rail.is-compact .pnode .edge{display:none}
+@container (max-width:820px){.pipe-rail:not(.is-compact){grid-template-columns:minmax(0,1fr)}.pipe-read{display:none}.pnode b small{display:none}}
+
+/* PipelineStatus (inspector 上下文) */
+.pipeline-status{display:grid;gap:10px}
+.pipeline-summary{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:8px 16px}
+.pipeline-summary>div{display:grid;gap:2px}
+.pipeline-summary>div>span{color:var(--muted);font-size:12px}
+.pipeline-summary strong{font-size:var(--fs-section);font-weight:600}
+.pipeline-summary dl{display:flex;gap:14px;margin:0}
+.pipeline-summary dl div{display:grid;gap:1px}
+.pipeline-summary dt{color:var(--muted);font-size:var(--fs-meta)}
+.pipeline-summary dd{margin:0;font-size:var(--fs-ui)}
+.pipeline-rotations>summary{font-size:12px;color:var(--ink-2)}
+.pipeline-rotations ol{display:grid;gap:4px;margin:6px 0 0;padding:0;list-style:none;font-size:12px}
+.pipeline-rotations li{display:flex;flex-wrap:wrap;gap:6px}
+.pipeline-rotations li span{color:var(--muted)}

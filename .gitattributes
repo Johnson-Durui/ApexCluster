@@ -1,0 +1,8 @@
+# The Cursor runtime is verified by its exact SHA-256 on every platform.
+src/adapters/cursor-writer-runtime.mjs text eol=lf
+# These public asset bytes are pinned in the fixed demo manifest.
+web/public/fixed-demo/prd.md text eol=lf
+web/public/fixed-demo/architecture.md text eol=lf
+web/public/fixed-demo/source.mjs text eol=lf
+web/public/fixed-demo/tests.txt text eol=lf
+web/public/fixed-demo/project.zip binary

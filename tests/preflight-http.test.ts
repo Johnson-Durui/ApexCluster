@@ -1,0 +1,83 @@
+import assert from 'node:assert/strict';
+import { createServer } from 'node:http';
+import type { AddressInfo } from 'node:net';
+import path from 'node:path';
+import { test } from 'node:test';
+import { GateInputZ } from '../src/core/schemas.js';
+import type { PreflightResult } from '../src/core/types.js';
+import { createApp } from '../src/server/app.js';
+import { makeHarness, runInput } from './helpers.js';
+
+test('T6 HTTP：预检权限/关卡/请求结构、重查零调用、并发守卫、度量和导出', async t => {
+  let checks = 0;
+  let hold = false;
+  let release!: () => void;
+  const h = makeHarness({}, () => {}, { preflightCheck: async () => {
+    checks++;
+    if (hold) await new Promise<void>(resolve => { release = resolve; });
+    return { ok: false, checkedAt: `2026-10-21T00:00:0${checks}.000Z`, items: [{ check: 'tool:node', status: 'missing', detail: '假工具缺失' }] } satisfies PreflightResult;
+  } });
+  const token = 't6-local-test-token';
+  const handler = createApp({ config: h.config, orchestrator: h.orch, bus: h.bus, token, staticDir: path.join(h.dir, 'no-web'), allowMockRuns: true });
+  const server = createServer((req, res) => void handler(req, res));
+  await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+  h.config.port = (server.address() as AddressInfo).port;
+  t.after(async () => {
+    release?.();
+    await h.orch.shutdown();
+    server.closeAllConnections();
+    await new Promise<void>(resolve => server.close(() => resolve()));
+  });
+  const base = `http://127.0.0.1:${h.config.port}`;
+  const post = (url: string, body: unknown = {}, authenticated = true) => fetch(base + url, {
+    method: 'POST', headers: { 'content-type': 'application/json', ...(authenticated ? { 'x-workbench-token': token } : {}) }, body: JSON.stringify(body),
+  });
+  const run = h.orch.createRun(runInput('clear', { clarifyWith: 'skip', preflightEnabled: true }));
+  await h.orch.idle();
+  const spec = h.orch.frameworkGateDefaults(run.id).find(x => x.candidateId === run.decision!.winnerId)!;
+  h.orch.resolveGate(run.id, GateInputZ.parse({ gate: 'G2_framework', action: 'validate', candidateIds: [spec.candidateId], specs: [spec.spec] }));
+  await h.orch.idle();
+  const endpoint = `/api/runs/${run.id}/jobs/${run.jobs[0]!.id}/preflight`;
+  assert.equal(checks, 1);
+  assert.equal((await post(endpoint, {}, false)).status, 403);
+  assert.equal((await post(endpoint, { command: 'arbitrary-command' })).status, 400);
+  assert.equal(checks, 1);
+  assert.equal((await post(`/api/runs/${run.id}/jobs/not-current/preflight`)).status, 400);
+  hold = true;
+  assert.equal((await post(endpoint)).status, 200);
+  assert.equal(checks, 2);
+  assert.equal((await post(endpoint)).status, 409);
+  assert.equal((await post(`/api/runs/${run.id}/gates`, { gate: 'G4_final', action: 'accept', chosenCandidateId: spec.candidateId, reason: '不应绕过检查' })).status, 409);
+  release();
+  await h.orch.idle();
+  assert.equal(run.phase, 'final_gate');
+  assert.equal(run.jobs[0]!.taskIds.length, 0);
+  assert.equal((await post(`/api/runs/${run.id}/gates`, { gate: 'G4_final', action: 'ignore_preflight', jobId: run.jobs[0]!.id, reason: '  ' })).status, 400);
+
+  const metricResponse = await fetch(`${base}/api/runs/${run.id}/metrics?asOf=2026-10-21T23%3A00%3A00Z`);
+  assert.equal(metricResponse.status, 200);
+  const metric = await metricResponse.json() as { runId: string; buildAttempts: number; firstRoundVerification: unknown; grouping: { mode: string }; asOf: string };
+  assert.equal(metric.runId, run.id);
+  assert.equal(metric.buildAttempts, 0);
+  assert.equal(metric.firstRoundVerification, null);
+  assert.equal(metric.grouping.mode, 'mock');
+  assert.equal(metric.asOf, '2026-10-21T23:00:00Z');
+  assert.equal((await fetch(`${base}/api/runs/${run.id}/metrics?asOf=bad`)).status, 400);
+  assert.equal((await fetch(`${base}/api/metrics?extra=true`)).status, 400);
+  assert.equal((await fetch(`${base}/api/runs/no-such-run/metrics`)).status, 404);
+  const aggregate = await (await fetch(`${base}/api/metrics`)).json() as { runCount: number; causalConclusion: null };
+  assert.equal(aggregate.runCount, 1);
+  assert.equal(aggregate.causalConclusion, null);
+  const exported = await (await fetch(`${base}/api/runs/${run.id}/export`)).text();
+  assert.ok(exported.includes('假工具缺失'));
+  assert.ok(exported.includes('## 运行度量'));
+  assert.ok(exported.includes('模拟数据'));
+  hold = false;
+  const proceed = await post(`/api/runs/${run.id}/gates`, { gate: 'G4_final', action: 'ignore_preflight', jobId: run.jobs[0]!.id, reason: '使用便携工具，显式继续' });
+  assert.equal(proceed.status, 200);
+  await h.orch.idle();
+  assert.equal(run.jobs[0]!.taskIds.length, 1);
+  assert.equal(checks, 2);
+  h.orch.resolveGate(run.id, GateInputZ.parse({ gate: 'G4_final', action: 'stop' }));
+  assert.equal((await post(endpoint)).status, 409);
+});

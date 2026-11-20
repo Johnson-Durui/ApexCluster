@@ -1,0 +1,54 @@
+{
+  "port": 5170,
+  "dataDir": "./data",
+  "workspacesRoot": "~/dmw-ws",
+  "targetPlatform": "Windows 11 x64（PowerShell）",
+  "models": {
+    "claude": { "adapter": "claude-code", "model": "claude-opus-5-5", "effort": "max" },
+    "astra": { "adapter": "codex", "model": "gpt-6.2-astra", "effort": "max" },
+    "sol": { "adapter": "codex", "model": "gpt-6.2-sol", "effort": "max" },
+    "grok": { "adapter": "cursor", "model": "grok-4.7-high-fast", "effort": "high" }
+  },
+  "docWriter": { "role": "claude", "effort": "xhigh" },
+  "preflight": { "enabled": true },
+  "build": { "autoRework": false, "maxRounds": 3, "maxWriterSessions": 12, "maxModelCalls": 20, "maxActiveMinutes": 360, "resumePolicy": "never", "lightReworkEnabled": false, "lightReworkMinutes": 5 },
+  "evaluator": { "enabled": false, "effort": "max", "timeoutMinutes": 30 },
+  "finalReview": { "enabled": false, "effort": "xhigh", "timeoutMinutes": 30 },
+  "contextBudget": { "enabled": false },
+  "chores": { "digest": false, "qgroup": false },
+  "adapters": {
+    "claude": {
+      "command": null,
+      "nativeSchema": "auto",
+      "promptOnlySchemaPhases": [],
+      "isolationArgs": ["--safe-mode"],
+      "extraArgs": []
+    },
+    "codex": {
+      "command": null,
+      "extraArgs": [],
+      "ignoreUserConfig": false,
+      "promptOnlySchemaPhases": []
+    },
+    "cursor": {
+      "command": null,
+      "extraArgs": [],
+      "scrubEnvKeys": ["CURSOR_API_KEY"],
+      "capabilities": null
+    },
+    "cursorWriter": { "capabilities": null },
+    "mock": { "delayMs": 800 }
+  },
+  "timeoutsMinutes": { "clarify": 30, "propose": 60, "review": 60, "recheck": 30, "docs": 60, "buildExtra": 30, "probe": 10 },
+  "limits": { "maxQuestionsPerTask": 12, "maxProposalsPerModel": 3, "maxConcurrentModelTasks": 2, "maxConcurrentJobs": 2 },
+  "decision": {
+    "tieMargin": 0.25,
+    "disagreementThreshold": 2,
+    "singleJudgeBand": 1,
+    "preferredOrigin": "claude",
+    "tiebreakCriterionId": "cost",
+    "tiebreakMinGap": 1
+  },
+  "criteriaWeights": { "fit": 0.3, "cost": 0.25, "reliability": 0.25, "performance": 0.1, "evolution": 0.1 },
+  "devOrigins": ["http://localhost:5173", "http://127.0.0.1:5173"]
+}

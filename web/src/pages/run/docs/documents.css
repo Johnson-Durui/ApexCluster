@@ -1,0 +1,37 @@
+/* 项目文档 (BUILD-SPEC-B §6.1). Doc kinds are a real tablist; the preview iframe stays sandbox=""; G3/G5 are the shared
+   decision card (run-layout.css). */
+.documents-stack{display:grid;gap:16px}
+.documents-stack>.panel{margin-bottom:0}
+.doc-kind-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:16px}
+.doc-kind-tabs button{display:grid;justify-items:start;gap:2px;min-height:54px;padding:8px 14px;border-color:var(--line-2);text-align:left}
+.doc-kind-tabs button b{font-size:13.5px;font-weight:600}
+.doc-kind-tabs button small{color:var(--muted);font-weight:400}
+.doc-kind-tabs button[aria-selected=true]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);background:var(--surface)}
+.doc-workspace{display:grid;grid-template-columns:210px minmax(0,1fr);gap:16px;align-items:start}
+.doc-history{position:sticky;top:0;display:grid;gap:8px}
+.doc-history h3{margin-bottom:2px;color:var(--ink-2);font-size:13px}
+.doc-history button{display:grid;justify-content:stretch;gap:2px;padding:9px 12px;font-weight:400;text-align:left}
+.doc-history button>span{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.doc-history button b{font-family:var(--mono)}
+.doc-history small{display:block;color:var(--muted)}
+.doc-history button.active{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);background:var(--surface)}
+.doc-main{display:flex;flex-direction:column;gap:10px;min-width:0}
+.doc-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.doc-toolbar small{display:block;margin-top:2px;color:var(--muted);font-family:var(--mono)}
+.doc-toolbar .btnbar{margin:0}
+.doc-warnings{padding:10px 14px;border:1px solid var(--wait-line);border-radius:var(--r2);background:var(--wait-bg);color:var(--wait)}
+.doc-warnings ul{margin-bottom:0}
+.doc-preview{display:block;width:100%;height:max(560px,calc(100vh - 420px));border:1px solid var(--line-2);border-radius:var(--r2);background:var(--surface)}
+.prd-evidence{grid-column:1/-1;display:grid;grid-template-columns:minmax(260px,.8fr) minmax(0,1.2fr);gap:16px;padding-top:16px;border-top:1px solid var(--line)}
+.prd-evidence>section{min-width:0;padding:14px;border:1px solid var(--line);border-radius:var(--r2)}
+.check-item{display:flex;gap:9px;padding:9px 0;border-top:1px solid var(--line);font-size:12.5px}
+.check-item>b{display:grid;place-items:center;flex:none;width:22px;height:22px;border-radius:50%}
+.check-item.ok>b{background:var(--ok-bg);color:var(--ok)}
+.check-item.warn>b{background:var(--wait-bg);color:var(--wait)}
+.check-item small{display:block;margin-top:3px;color:var(--muted)}
+.prd-evidence details{padding:9px 0;border-top:1px solid var(--line)}
+.prd-evidence dl{display:grid;grid-template-columns:64px minmax(0,1fr);gap:5px 10px;font-size:12px}
+.prd-evidence dt{color:var(--muted)}
+.prd-evidence dd{margin:0;overflow-wrap:anywhere}
+.doc-gate .form-grid{gap:2px 18px}
+@media (max-width:1050px){.doc-workspace{grid-template-columns:minmax(0,1fr)}.doc-history{position:static;grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}.doc-history h3{grid-column:1/-1}.prd-evidence{grid-template-columns:minmax(0,1fr)}.doc-preview{height:620px}}

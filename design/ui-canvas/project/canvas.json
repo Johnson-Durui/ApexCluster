@@ -1,0 +1,176 @@
+{
+  "v": 3,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-10-12T03:45:00Z"
+  },
+  "title": "双模型工作台 UI 设计",
+  "launch": {
+    "view": "canvas"
+  },
+  "pages": [],
+  "boards": {
+    "Main.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 1270,
+      "title": "首页 · 运行列表",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "New.dc.html": {
+      "x": 1520,
+      "y": 0,
+      "w": 1440,
+      "h": 2550,
+      "title": "新建评审",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Env.dc.html": {
+      "x": 3040,
+      "y": 0,
+      "w": 1440,
+      "h": 1030,
+      "title": "环境检查",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "Tokens.dc.html": {
+      "x": 4560,
+      "y": 0,
+      "w": 1440,
+      "h": 2060,
+      "title": "设计规范 v0.4",
+      "expand": "fill"
+    },
+    "RunLive.dc.html": {
+      "x": 0,
+      "y": 2910,
+      "w": 1440,
+      "h": 960,
+      "title": "运行 · 执行过程（两位模型并排生成）",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "RunG1.dc.html": {
+      "x": 1520,
+      "y": 2910,
+      "w": 1440,
+      "h": 2170,
+      "title": "运行 · G1 回答澄清问题",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "RunProposals.dc.html": {
+      "x": 3040,
+      "y": 2910,
+      "w": 1440,
+      "h": 2170,
+      "title": "运行 · 架构方案",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "RunCompare.dc.html": {
+      "x": 4560,
+      "y": 2910,
+      "w": 1440,
+      "h": 1740,
+      "title": "运行 · 评审对比",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "RunG2.dc.html": {
+      "x": 6080,
+      "y": 2910,
+      "w": 1440,
+      "h": 2550,
+      "title": "运行 · G2 框架决策与 Ultra 裁决",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "RunG3.dc.html": {
+      "x": 7600,
+      "y": 2910,
+      "w": 1440,
+      "h": 1960,
+      "title": "运行 · G3 文档确认",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "RunG4.dc.html": {
+      "x": 9120,
+      "y": 2910,
+      "w": 1440,
+      "h": 1570,
+      "title": "运行 · G4 MVP 验收",
+      "expand": "fill",
+      "is_interactive": true
+    },
+    "MobileLive.dc.html": {
+      "x": 0,
+      "y": 5820,
+      "w": 390,
+      "h": 2840,
+      "title": "手机 · 执行过程",
+      "is_interactive": true
+    },
+    "Mobile.dc.html": {
+      "x": 470,
+      "y": 5820,
+      "w": 390,
+      "h": 5080,
+      "title": "手机 · G1 回答问题",
+      "is_interactive": true
+    },
+    "MobileG2.dc.html": {
+      "x": 940,
+      "y": 5820,
+      "w": 390,
+      "h": 5320,
+      "title": "手机 · G2 框架决策",
+      "is_interactive": true
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "New.dc.html",
+    "Env.dc.html",
+    "Tokens.dc.html",
+    "RunLive.dc.html",
+    "RunG1.dc.html",
+    "RunProposals.dc.html",
+    "RunCompare.dc.html",
+    "RunG2.dc.html",
+    "RunG3.dc.html",
+    "RunG4.dc.html",
+    "MobileLive.dc.html",
+    "Mobile.dc.html",
+    "MobileG2.dc.html"
+  ],
+  "notes": {
+    "r1": {
+      "x": 0,
+      "y": -300,
+      "text": "首页、新建、环境与设计规范",
+      "kind": "title1",
+      "maxW": 6000
+    },
+    "r2": {
+      "x": 0,
+      "y": 2610,
+      "text": "运行工作区 · 模型并排占满主区，等你决定的关卡始终最醒目",
+      "kind": "title1",
+      "maxW": 10560
+    },
+    "r3": {
+      "x": 0,
+      "y": 5520,
+      "text": "窄屏 390",
+      "kind": "title1",
+      "maxW": 1330
+    }
+  },
+  "designSystems": []
+}

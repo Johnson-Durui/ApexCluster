@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="RoomDesk 团队会议室预约：按楼层查看会议室，实时检测冲突，导出 iCal 日历。">
+  <title>RoomDesk · 团队会议室预约</title>
+  <!-- 图标内联为 data URI：页面放在任意子路径下都不会去请求站点根目录的 /favicon.ico。 -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f46e5'/%3E%3Crect x='8' y='9' width='16' height='15' rx='2.5' fill='none' stroke='%23fff' stroke-width='2'/%3E%3Cpath d='M8 14h16M13 7v4M19 7v4' stroke='%23fff' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
+  <!-- 全部使用相对路径，部署在子路径（例如 /some/path/demo-project/）下同样可用。 -->
+  <link rel="stylesheet" href="./src/styles.css">
+  <script type="module" src="./src/app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8"/><rect x="8" y="9" width="16" height="15" rx="2.5"/><path d="M8 14h16M13 7v4M19 7v4"/></svg>
+      <div class="brand-text">
+        <strong>RoomDesk</strong>
+        <span>团队会议室预约</span>
+      </div>
+    </div>
+    <div class="topbar-meta">
+      <span class="sample-badge" title="页面预置的示例预约，可以删除，也可以随时恢复">示例数据</span>
+      <span id="summary" class="summary" aria-live="polite"></span>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="card board" aria-labelledby="board-title">
+      <div class="board-head">
+        <h1 id="board-title" class="sr-only">会议室日程</h1>
+        <div class="floor-tabs" id="floor-tabs" role="tablist" aria-label="按楼层筛选"></div>
+        <div class="day-nav">
+          <button type="button" class="icon-button" id="prev-day" aria-label="前一天">‹</button>
+          <input type="date" id="view-date" aria-label="查看日期">
+          <button type="button" class="icon-button" id="next-day" aria-label="后一天">›</button>
+          <button type="button" class="ghost-button" id="go-today">今天</button>
+          <button type="button" class="ghost-button" id="export-day" title="把当天全部预约导出为一个 .ics 文件">导出当天 .ics</button>
+        </div>
+      </div>
+      <div class="timeline-scroll">
+        <div class="timeline" id="timeline" aria-describedby="timeline-help"></div>
+      </div>
+      <div class="board-foot">
+        <p id="timeline-help" class="hint">点击空白处可按该时间开始填写预约；点击已有预约查看详情、下载 .ics 或取消。</p>
+        <ul class="legend" aria-label="图例">
+          <li><span class="swatch swatch-mine"></span>我的预约</li>
+          <li><span class="swatch swatch-other"></span>他人预约</li>
+          <li><span class="swatch swatch-draft"></span>正在填写</li>
+        </ul>
+      </div>
+    </section>
+
+    <aside class="side">
+      <form class="card booking-form" id="booking-form" novalidate>
+        <div class="card-head">
+          <h2>新建预约</h2>
+          <span class="duration" id="duration" aria-live="polite"></span>
+        </div>
+        <label class="field">
+          <span>会议室</span>
+          <select id="f-room" name="roomId" required></select>
+        </label>
+        <div class="field-row">
+          <label class="field field-date">
+            <span>日期</span>
+            <input type="date" id="f-date" name="date" required>
+          </label>
+          <label class="field">
+            <span>开始</span>
+            <select id="f-start" name="start" required></select>
+          </label>
+          <label class="field">
+            <span>结束</span>
+            <select id="f-end" name="end" required></select>
+          </label>
+        </div>
+        <label class="field">
+          <span>会议主题</span>
+          <input type="text" id="f-title" name="title" maxlength="40" placeholder="例如：周会、产品评审" autocomplete="off" required>
+        </label>
+        <label class="field">
+          <span>预约人</span>
+          <input type="text" id="f-organiser" name="organiser" maxlength="20" autocomplete="off" required>
+        </label>
+        <div class="check" id="check" role="status" aria-live="polite"></div>
+        <button type="submit" class="primary-button" id="submit">确认预约</button>
+      </form>
+
+      <section class="card mine" aria-labelledby="mine-title">
+        <div class="card-head">
+          <h2 id="mine-title">我的预约</h2>
+          <span class="count" id="mine-count"></span>
+        </div>
+        <ul class="mine-list" id="mine-list"></ul>
+      </section>
+    </aside>
+  </main>
+
+  <footer class="footer">
+    <span id="storage-note">预约保存在当前浏览器的本地存储中，不会上传到任何服务器。</span>
+    <button type="button" class="link-button" id="reset">恢复示例数据</button>
+  </footer>
+
+  <dialog class="detail" id="detail" aria-labelledby="detail-title">
+    <form method="dialog" class="detail-body">
+      <div class="detail-head">
+        <h2 id="detail-title"></h2>
+        <button value="close" class="icon-button" aria-label="关闭">×</button>
+      </div>
+      <dl class="detail-list" id="detail-list"></dl>
+      <div class="detail-actions">
+        <button type="button" class="ghost-button" id="detail-ics">下载 .ics</button>
+        <button type="button" class="danger-button" id="detail-remove">取消预约</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+  <noscript><p class="noscript">RoomDesk 需要启用 JavaScript。</p></noscript>
+</body>
+</html>

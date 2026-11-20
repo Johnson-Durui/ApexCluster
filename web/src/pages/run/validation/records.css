@@ -1,0 +1,58 @@
+.records-stack{display:grid;gap:16px}
+.records-stack>.panel{margin-bottom:0}
+.records-stack .table-scroll{border:1px solid var(--line);border-radius:var(--r2)}
+.records-stack table tr:last-child td{border-bottom:0}
+.snapshot-list{display:grid;gap:8px}
+.snapshot-card{border:1px solid var(--line);border-radius:var(--r2);background:var(--surface-2)}
+.snapshot-card>summary{display:flex;justify-content:space-between;gap:14px;padding:12px 14px}
+.snapshot-card>div{padding:0 14px 14px}
+.snapshot-card .snapshot-meta{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12px;color:var(--muted);padding:10px 0;border-top:1px solid var(--line);background:transparent;border-radius:0}
+.snapshot-diff{background:var(--surface);padding:12px;border-radius:var(--r2);border:1px solid var(--line)}
+.snapshot-diff ul{margin-bottom:0}
+.snapshot-diff li{margin:5px 0}
+.snapshot-diff .badge{margin-right:8px}
+.records-stack td small{display:block;color:var(--muted);margin-top:3px}
+.records-stack td .badge{margin:4px 4px 0 0}
+.records-d8{margin:14px 0 0}
+.metrics-view{display:grid;gap:14px}
+.metrics-asof{margin:0}
+.metrics-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.metrics-summary dl{margin:0;padding:10px 12px;border:1px solid var(--line);border-radius:var(--r2);background:var(--surface-2)}
+.metrics-summary dt{font-size:12px;color:var(--muted)}
+.metrics-summary dd{margin:4px 0 0;font-weight:600}
+.metrics-table{border:1px solid var(--line);border-radius:var(--r2)}
+.metrics-empty{margin:0;padding:12px 14px}
+.metrics-detail{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.metrics-detail>div{padding:12px 14px;border:1px solid var(--line);border-radius:var(--r2);background:var(--surface-2)}
+.metrics-detail p{margin:6px 0 0}
+.metrics-detail ul,.metrics-detail ol{margin:8px 0 0;padding-left:20px}
+.gate-timeline{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.gate-timeline article{padding:14px;border:1px solid var(--line);border-radius:var(--r2);background:var(--surface-2)}
+.gate-timeline article>div{display:flex;align-items:center;gap:8px}
+.gate-timeline dl{display:grid;grid-template-columns:auto 1fr;gap:5px 10px;font-size:12.5px}
+.gate-timeline dt{color:var(--muted)}
+.gate-timeline dd{margin:0}
+.gate-timeline pre{margin-top:10px;padding:10px;background:var(--surface);max-height:220px;overflow:auto;border-radius:var(--r1)}
+.archived-rounds{margin-top:14px}
+.export-panel{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.export-panel p{margin:6px 0 0}
+.adjudication-history{display:grid;gap:10px}
+.adjudication-history>details{border:1px solid var(--line);border-top:3px solid var(--s-astra);border-radius:var(--r2);background:var(--surface-2)}
+.adjudication-history>details.stale{border-top-color:var(--err)}
+.adjudication-history summary{display:flex;justify-content:space-between;gap:14px;padding:12px 14px}
+.adjudication-history summary span:last-child{color:var(--muted);font-size:12.5px}
+.adjudication-history details>div{padding:0 14px 14px}
+.adjudication-record-meta{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 12px;padding:12px;background:var(--surface);font-size:12.5px;border-radius:var(--r1)}
+.adjudication-record-meta dt{color:var(--muted)}
+.adjudication-record-meta dd{margin:0}
+.record-recommendation{margin-top:12px;padding:12px;border:1px solid var(--line-2);border-radius:var(--r2);background:var(--surface-2)}
+.record-recommendation p{margin:5px 0 0}
+.record-adjudication-items{display:grid;gap:8px;margin-top:10px}
+.record-adjudication-items article{padding:12px;border:1px solid var(--line);border-radius:var(--r2);background:var(--surface)}
+.record-adjudication-items p{margin:8px 0}
+.record-adjudication-items ul{margin:8px 0;font-size:12.5px}
+.record-adjudication-items small{color:var(--muted)}
+@media(max-width:650px){.snapshot-card>summary,.export-panel{align-items:flex-start;flex-direction:column}.metrics-detail{grid-template-columns:minmax(0,1fr)}.adjudication-history summary{display:grid}.adjudication-record-meta{grid-template-columns:minmax(0,1fr)}.adjudication-record-meta dd{margin-bottom:6px}}
+/* keep short CJK labels whole in the wide metadata tables (they scroll horizontally instead of splitting words) */
+.records-stack .table-scroll>table{min-width:960px}
+.records-stack td{word-break:keep-all;overflow-wrap:break-word}

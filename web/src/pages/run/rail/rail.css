@@ -1,0 +1,57 @@
+/* Context rail (BUILD-SPEC-B §6.1): white cards on --surface-2. 下一步 for a gate is the shared .decision-card with a
+   .gate.outline jump (the filled .gate lives in the gate section itself); blocked gets a 3px --err rule. */
+.rail-card{display:flex;flex-direction:column;gap:8px;min-width:0;padding:12px 14px;border:1px solid var(--line-2);border-radius:var(--r2);background:var(--surface);font-size:12.5px}
+.rail-card p{margin:0;font-size:12.5px;line-height:1.65;color:var(--ink-2)}
+.rail-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.rail-head h2{flex:1 1 auto;min-width:0;margin:0;font-size:13px;font-weight:600}
+.rail-head .mono{font-size:var(--fs-meta)}
+.rail-head>.muted{font-size:var(--fs-meta)}
+.rail-card>:is(button,a){align-self:flex-start}
+.rail-link{margin-left:-6px;padding-left:6px;padding-right:6px;color:var(--ink-2)}
+.rail-link:hover{color:var(--ink)}
+
+/* 下一步 · gate: decision card (chamfer + 3px --gate rule come from styles/base.css) */
+.rail-next{flex:none}
+.rail-card.decision-card{display:block;padding:1px;border:0;border-radius:0;background:var(--gate-line)}
+.rail-card.decision-card>.decision-in{gap:8px;padding:12px 14px 14px 16px}
+.rail-card.is-gate h2{margin:0;font-size:14px;font-weight:600;color:var(--ink)}
+.rail-card.is-gate .rail-key{font-size:12px;font-weight:600}
+.rail-card.is-gate .gate.outline{justify-self:start}
+
+/* 下一步 · blocked / running */
+.rail-card.bad{border-color:var(--err-line);box-shadow:inset 3px 0 0 var(--err)}
+.rail-card.bad h2{color:var(--err)}
+.rail-clamp{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.rail-card.running h2>span{font-size:10px;color:var(--run)}
+.rail-live{flex:none;width:7px;height:7px;border-radius:50%;background:var(--ok);animation:run-live 1.9s ease-in-out infinite}
+.rail-tasks{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}
+.rail-tasks li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:8px;font-size:12.5px}
+.rail-tasks .mono{font-size:var(--fs-meta)}
+
+/* 澄清问题 */
+.rail-card p.rail-note{font-size:12px;color:var(--ink-2)}
+.rail-questions{display:flex;flex-direction:column;gap:4px;margin:0;padding:0;list-style:none}
+.rail-questions button{width:100%;justify-content:flex-start;align-items:flex-start;gap:8px;min-height:0;padding:7px 9px;border-color:var(--line);background:var(--surface-2);font-size:12.5px;font-weight:400;text-align:left}
+.rail-questions .mono{flex:none;font-size:var(--fs-meta);line-height:1.6;color:var(--muted)}
+.rail-q-text{flex:1;min-width:0;line-height:1.5}
+
+/* 需求快照 */
+.rail-counts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin:0;border:1px solid var(--line);border-radius:var(--r2);text-align:center}
+.rail-counts div{display:flex;flex-direction:column-reverse;padding:6px 0;border-left:1px solid var(--line)}
+.rail-counts div:first-child{border-left:0}
+.rail-counts dt{font-size:var(--fs-meta);color:var(--muted)}
+.rail-counts dd{margin:0;font:20px/1.2 var(--num);font-variant-numeric:lining-nums tabular-nums;color:var(--ink)}
+.rail-constraints{display:flex;flex-direction:column;gap:5px;margin:0;padding:0;list-style:none;font-size:12.5px}
+.rail-constraints li{display:flex;align-items:flex-start;gap:8px}
+.rail-constraints .badge{min-height:20px;padding:1px 6px;font-size:var(--fs-meta)}
+.rail-constraints li>span:last-child{min-width:0;line-height:1.55}
+
+/* 运行配置 */
+/* dot · seat name · model id · effort; subgrid rows so the model ids line up in one column */
+.rail-models{display:grid;grid-template-columns:auto auto minmax(0,1fr) auto;gap:6px 8px;margin:0;padding:0;list-style:none}
+.rail-models li{display:grid;grid-column:1/-1;grid-template-columns:subgrid;align-items:center}
+.rail-models .rail-seat{font-size:12.5px;font-weight:600;color:var(--ink)}
+.rail-models .mono{overflow:hidden;font-size:var(--fs-meta);white-space:nowrap;text-overflow:ellipsis}
+.rail-kv{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;margin:0;font-size:12.5px}
+.rail-kv dt{color:var(--muted)}
+.rail-kv dd{margin:0;overflow-wrap:anywhere}

@@ -1,0 +1,91 @@
+/* 执行过程 (BUILD-SPEC-B §6.1): one pane per task in the selected stage. Logs are light mono panels (--code-bg); kind
+   colours come from the state tokens. Loops run only while a task runs (§7 rows 20 and 24). */
+.live{flex:1 1 auto;min-height:540px;display:flex;flex-direction:column;gap:10px}
+.live-empty{justify-content:center;align-items:center;min-height:360px;border:1px solid var(--line-2);border-radius:var(--r2);background:var(--surface)}
+.live-head{display:flex;align-items:center;justify-content:space-between;gap:10px 24px;flex-wrap:wrap}
+.live-title{flex:1 1 320px;min-width:0}
+.live-title h2{margin:0 0 2px;font-size:var(--fs-gate)}
+.live-title p{max-width:900px;margin:0;color:var(--muted);font-size:13px}
+.live-stats{display:flex;gap:0;flex-wrap:wrap;margin:0;border:1px solid var(--line-2);border-radius:var(--r2);background:var(--surface)}
+.live-stats div{display:flex;align-items:baseline;gap:6px;padding:4px 11px;border-left:1px solid var(--line)}
+.live-stats div:first-child{border-left:0}
+.live-stats dt{font-size:12px;color:var(--muted)}
+.live-stats dd{margin:0;font:600 13px/1.5 var(--mono)}
+.live-stats dd.bad{color:var(--err)}
+.live-stages{display:flex;gap:6px;flex-wrap:wrap;flex:0 1 auto}
+.stage-btn{gap:7px;min-height:30px;padding:3px 11px;border-radius:var(--pill);font-size:12.5px;font-weight:500}
+.stage-btn.active{background:var(--ink);border-color:var(--ink);color:var(--on-dark)}
+.stage-btn.active:hover{background:var(--ink-hover);border-color:var(--ink-hover);color:var(--on-dark)}
+.stage-dot{flex:none;width:8px;height:8px;border-radius:50%;background:var(--idle)}
+.stage-btn.done .stage-dot{background:var(--ok)}
+.stage-btn.failed .stage-dot{background:var(--err)}
+.stage-btn.mixed .stage-dot{background:var(--wait-bar)}
+.stage-btn.running .stage-dot{background:var(--ok);animation:run-live 1.9s ease-in-out infinite}
+.stage-btn.active .stage-dot{box-shadow:0 0 0 2px var(--surface)}
+.live-notice{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:8px 12px;border:1px solid var(--line-2);border-radius:var(--r2);background:var(--surface-3);color:var(--ink-2);font-size:13px}
+
+.live-grid{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:repeat(var(--cols,1),minmax(0,1fr));gap:14px}
+.live-pane{position:relative;container-type:inline-size;min-width:0;min-height:420px;display:flex;flex-direction:column;overflow:hidden;border:1px solid var(--line-2);border-top:3px solid var(--ink-s,var(--line-3));border-radius:var(--r2);background:var(--surface)}
+.live-pane.claude{--ink-s:var(--s-claude)}.live-pane.astra{--ink-s:var(--s-astra)}.live-pane.sol{--ink-s:var(--s-sol)}.live-pane.grok{--ink-s:var(--s-grok)}
+.live-pane:is(.failed,.timed_out){border-color:var(--err-line);border-top-color:var(--err)}
+.lp-progress{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--ink),transparent) no-repeat;background-size:40% 100%;animation:lp-slide 1.6s linear infinite}
+@keyframes lp-slide{from{background-position:-60% 0}to{background-position:160% 0}}
+.lp-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;border-bottom:1px solid var(--line)}
+.lp-title{display:flex;flex-direction:column;flex:1 1 160px;min-width:0}
+.lp-title b{font-size:14px;line-height:1.35}
+.lp-title small{color:var(--muted)}
+.lp-badges{display:flex;gap:6px;flex-wrap:wrap}
+.lp-metrics{display:flex;flex-wrap:wrap;gap:4px 18px;margin:0;padding:8px 14px;border-bottom:1px solid var(--line);background:var(--surface-2)}
+.lp-metrics div{display:flex;align-items:baseline;gap:6px;min-width:0}
+.lp-metrics dt{font-size:12px;color:var(--muted);white-space:nowrap}
+.lp-metrics dd{margin:0;font-size:13px;font-weight:600;overflow-wrap:anywhere}
+.lp-metrics dd.num{font-family:var(--mono);font-weight:500}
+.lp-metrics dd.mono{font-size:12.5px;font-weight:500}
+.lp-metrics dd.warn{color:var(--wait)}
+.lp-metrics dd small{font-weight:400;color:var(--muted)}
+.lp-failure{margin:12px 14px 0;padding:10px 12px;border:1px solid var(--err-line);border-radius:var(--r2);background:var(--err-bg);box-shadow:inset 3px 0 0 var(--err);color:var(--err);font-size:13px}
+.lp-failure p{margin:4px 0 0;color:var(--ink-2);overflow-wrap:anywhere}
+.lp-spec{margin:10px 14px 0;font-size:12.5px}
+.lp-spec ul{margin:6px 0 0;padding-left:18px}
+.lp-spec code{margin-left:6px}
+.lp-log-head{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:10px 14px 6px;color:var(--ink-2);font-size:12px;font-weight:600}
+.lp-log-head .muted{font-weight:400}
+
+/* light mono log */
+.lp-log{flex:1 1 auto;min-height:200px;margin:0 14px 12px;padding:6px 0;overflow:auto;list-style:none;border:1px solid var(--line);border-radius:var(--r2);background:var(--code-bg);color:var(--ink-2);font:12px/1.7 var(--mono)}
+.lp-log li{display:grid;grid-template-columns:64px 58px minmax(0,1fr);gap:8px;padding:1px 12px}
+.lp-log li:hover{background:var(--hover)}
+.lp-log time{color:var(--muted)}
+.lp-kind{color:var(--muted);font-family:var(--font);font-size:var(--fs-meta)}
+.lp-text{overflow-wrap:anywhere;white-space:pre-wrap}
+.k-tool .lp-kind{color:var(--wait)}
+.k-retry .lp-kind,.k-stderr .lp-kind{color:var(--err)}
+.k-stderr .lp-text{color:var(--err)}
+.k-started .lp-kind{color:var(--ok)}
+.k-usage .lp-kind{color:var(--gate-ink)}
+.k-message .lp-kind{color:var(--s-grok)}
+.lp-log li.lp-empty{display:block;padding:10px 12px;color:var(--muted);font-family:var(--font)}
+.lp-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:8px 14px;border-top:1px solid var(--line);background:var(--surface-2)}
+.lp-foot .mono{font-size:var(--fs-meta)}
+
+/* raw files dialog */
+.raw-viewer pre{white-space:pre-wrap;overflow-wrap:anywhere}
+.raw-tabs{display:flex;gap:6px;overflow:auto;margin-bottom:10px}
+.raw-tabs button{min-height:28px;padding:2px 10px;font-size:12.5px}
+.raw-tabs button.active{background:var(--ink);border-color:var(--ink);color:var(--on-dark)}
+
+@container (max-width:520px){
+  .lp-log li{grid-template-columns:58px minmax(0,1fr)}
+  .lp-log .lp-kind{display:none}
+}
+@media (min-width:1100px) and (min-height:640px){
+  .live-pane{min-height:0;overflow:auto}
+  .lp-log{min-height:120px;flex-basis:0}
+}
+@media (max-width:1099px),(max-height:639px){
+  .live-grid{grid-template-columns:minmax(0,1fr)}
+  .live-pane{min-height:0}
+  .lp-log{max-height:420px}
+}
+@media (max-height:860px){.live-title p,.live-title .eyebrow{display:none}}
+:root[data-motion=reduce] .lp-progress{display:none}

@@ -1,0 +1,69 @@
+/* Design tokens · 指挥台 Command Deck (BUILD-SPEC-B §2). This is the only :root block in the app. */
+:root{
+  color-scheme:light;
+  --font:"Segoe UI Variable Text","Segoe UI","Microsoft YaHei UI","Microsoft YaHei",system-ui,sans-serif;
+  --mono:"Cascadia Mono","Cascadia Code",Consolas,"Microsoft YaHei UI",monospace;   /* ids, times, tokens, models; tabular-nums */
+  --num:Georgia,"Times New Roman","Microsoft YaHei UI",serif;                       /* upright numerals; seat name in inspector */
+  /* planes */
+  --canvas:#eef1f5; --side-bg:#f3f5f8; --pane:#fbfbf9; --paper:#fcfbf8; --surface:#fff; --surface-2:#f7f8fa; --surface-3:#f1f3f7; --code-bg:#f5f7fa;
+  --mist-0:#f7f8fb; --mist-1:#e6ebf2; --mist:linear-gradient(180deg,var(--mist-0),var(--mist-1)); --grid:rgba(41,53,83,.055);
+  --line:#e0e5ed; --line-2:#cbd3e0; --line-3:#aeb9d0; --hover:rgba(41,53,83,.035); --select:rgba(41,53,83,.06); --veil:rgba(232,236,243,.55);
+  /* ink. Text tokens (>=4.5:1 on canvas/pane/surface): --ink --ink-2 --muted. Glyph/rule-only: --faint --ghost */
+  --ink:#293553; --ink-hover:#1f2942; --ink-2:#475674; --muted:#5d6883; --faint:#77819a; --ghost:#9aa5bb; --on-dark:#fff;
+  /* state: always glyph + word + colour. --queued/--idle are glyph colours; their words use --muted */
+  --run:#1f232b; --queued:#8f9ab0; --idle:#77819a; --stop:#5d6883;
+  --ok:#1d7146;  --ok-bg:#e9f3ed;  --ok-line:#b5d6c1;
+  --wait:#975006; --wait-bg:#fbf1e3; --wait-line:#e3c79c; --wait-bar:#b7781f;
+  --err:#b42318; --err-bg:#fbeceb; --err-line:#e2b3ae;
+  --mock-ink:#4f4b2c; --mock-bg:#f7f6ef; --mock-line:#b0a97c;
+  /* indigo: ONLY things waiting on the user (等你决定 / 等你回答). Primary actions are ink, never indigo. Focus is ink, never indigo. */
+  --gate:#586b99; --gate-ink:#40527f; --gate-hover:#34446c; --gate-bg:#edf0f7; --gate-line:#b9c3d8;
+  /* seat inks (identical to observatoryTheme.SEAT_INKS; unknown seats use seatInk() inline via --ink-s) */
+  --s-claude:#aa5131; --s-astra:#17677f; --s-sol:#927315; --s-grok:#68449c; --s-opus:#94344d;
+  --s-carbon:#a05188; --s-hydrogen:#9572ae; --s-deepseek:#0b8274; --s-mini:#728a2f;
+  /* --speak: set inline on .chat-work = --ink-s of the seat of the most recently started running task, else --ink */
+  /* type scale; 11.5px is the minimum text size anywhere (rail labels and type tiles included) */
+  --fs-meta:11.5px; --fs-dense:12.5px; --fs-ui:13px; --fs-body:14px; --fs-section:15px; --fs-gate:16px;
+  --fs-h1:20px; --fs-welcome:26px; --fs-num-s:24px; --fs-num-m:34px; --fs-num-l:56px;
+  --lh-tight:1.3; --lh-ui:1.55; --lh-body:1.75;
+  /* spacing, 4px base */
+  --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px; --sp-6:24px; --sp-8:32px; --gutter:24px;
+  /* shell geometry */
+  --side-w:248px; --top-h:44px; --status-h:28px; --strip-h:40px; --deck-head-h:40px; --rail-h:68px;
+  --splitter-w:7px; --mini-rail-w:60px; --insp-w:360px; --col-max:780px; --dock-min:150px; --stage-min:330px;
+  /* radius; the chamfer is the one shape that means "decision" */
+  --r1:2px; --r2:4px; --r3:6px; --pill:999px; --chamfer:14px; --chamfer-sm:8px;
+  /* elevation */
+  --e1:0 1px 2px rgba(41,53,83,.07),0 10px 22px -12px rgba(41,53,83,.30);
+  --e2:inset 0 1px 0 rgba(255,255,255,.95),0 2px 4px rgba(41,53,83,.08),0 18px 34px -14px rgba(41,53,83,.36);
+  --e-gate:drop-shadow(0 10px 20px rgba(64,82,127,.13));        /* a filter on the wrapper; clip-path would cut a box-shadow */
+  --e-sheet:0 30px 80px -24px rgba(35,45,72,.45),0 2px 8px rgba(35,45,72,.10);
+  /* one glass, two strengths. backdrop-filter ONLY on the composer (strong) and popovers. Stage legend, toasts and
+     jump/follow pills use --glass-strong-bg with NO backdrop-filter. Nothing with backdrop-filter overlaps the canvas or the log */
+  --glass-bg:rgba(255,255,255,.78); --glass-strong-bg:rgba(255,255,255,.90);
+  --glass-blur:blur(14px) saturate(1.1); --glass-strong-blur:blur(20px) saturate(1.1);
+  --glass-line:rgba(150,163,191,.55); --glass-shadow:inset 0 1px 0 #fff,0 8px 32px rgba(41,53,83,.11);
+  /* focus */
+  --focus-outline:2px solid var(--ink); --focus-offset:2px; --focus-halo:0 0 0 4px rgba(255,255,255,.9); --field-focus:0 0 0 3px rgba(41,53,83,.10);
+  /* motion (IDEA-BOARD §2 tokens) */
+  --ease-out:cubic-bezier(.16,1,.3,1); --ease-settle:cubic-bezier(.22,1,.36,1); --ease-io:cubic-bezier(.65,0,.35,1);
+  --ease-morph:cubic-bezier(.33,0,.2,1); --ease-pop:cubic-bezier(.34,1.56,.64,1);   /* pop: only the approved/complete tick */
+  --t-press:120ms; --t-hover:150ms; --t-chip:180ms; --t-comp:240ms; --t-sheet:280ms; --t-sheet-out:220ms;
+  --t-flip:400ms; --t-camera:420ms; --t-sweep:700ms; --t-count:800ms; --t-sheen:1150ms;
+  --stagger-row:20ms; --stagger-draw:30ms; --stagger-card:80ms;
+  --z-split:3; --z-sticky:10; --z-pop:40; --z-toast:60;
+}
+@media (max-width:1599px){:root{--insp-w:340px}}
+@media (max-width:1439px){:root{--insp-w:316px}}
+@media (max-width:1320px){:root{--gutter:16px;--side-w:64px}}
+
+/* Seat ink per [data-seat]. Components set --ink-s inline (seatInk()) for seats not listed here. */
+[data-seat=claude]{--ink-s:var(--s-claude)}
+[data-seat=astra]{--ink-s:var(--s-astra)}
+[data-seat=sol]{--ink-s:var(--s-sol)}
+[data-seat=grok]{--ink-s:var(--s-grok)}
+[data-seat=opus]{--ink-s:var(--s-opus)}
+[data-seat=carbon]{--ink-s:var(--s-carbon)}
+[data-seat=hydrogen]{--ink-s:var(--s-hydrogen)}
+[data-seat=deepseek]{--ink-s:var(--s-deepseek)}
+[data-seat=mini]{--ink-s:var(--s-mini)}

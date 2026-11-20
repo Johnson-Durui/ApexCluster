@@ -1,0 +1,67 @@
+/* 框架决策 (BUILD-SPEC-B §6.1). The G2 form is the shared decision card (run-layout.css); selections inside it are ink —
+   indigo marks only that the gate waits on you. .evidence-list is scoped to .decision-stack. */
+.decision-stack{display:grid;gap:16px}
+.decision-stack .panel{margin-bottom:0}
+.decision-top{display:grid;gap:16px}
+.decision-col{display:grid;align-content:start;gap:16px;min-width:0}
+.decision-top.split-view{align-items:start}
+.decision-hero{border-top:3px solid var(--ink)}
+.decision-lead{display:flex;align-items:center;gap:14px;margin-bottom:14px;padding:12px 14px;border:1px solid var(--line);border-radius:var(--r2);background:var(--surface-2)}
+.decision-mark{display:grid;place-items:center;flex:none;width:40px;height:40px;background:var(--ink);color:var(--on-dark);clip-path:polygon(var(--chamfer-sm) 0,100% 0,100% 100%,0 100%,0 var(--chamfer-sm))}
+.decision-lead strong,.decision-lead span{display:block}
+.decision-lead strong{margin-bottom:3px;font-size:var(--fs-gate)}
+.decision-lead span{color:var(--muted);font-size:12.5px}
+.decision-explanation{max-width:1100px}
+.decision-explanation p{margin-bottom:8px;white-space:pre-wrap}
+.d8-note{margin:14px 0 0}
+.uncertainty-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,520px),1fr));gap:8px}
+.uncertainty-item{display:grid;grid-template-columns:auto auto minmax(0,1fr) auto;align-items:center;gap:10px;padding:10px 14px;border:1px solid var(--line);border-radius:var(--r2);background:var(--surface-2);cursor:pointer}
+.uncertainty-item.key{border-color:var(--err-line);background:var(--surface);box-shadow:inset 3px 0 0 var(--err)}
+.uncertainty-item b,.uncertainty-item small{display:block}
+.uncertainty-item small{margin-top:2px;color:var(--muted)}
+.impact{color:var(--muted);font-size:12px;white-space:nowrap}
+.candidate-picker{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:10px;margin-bottom:16px}
+.candidate-picker label{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:1px solid var(--line-2);border-radius:var(--r2);background:var(--surface);cursor:pointer}
+.candidate-picker label.selected{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.candidate-picker b,.candidate-picker small{display:block}
+.candidate-picker small{margin-top:4px;color:var(--muted);font-family:var(--mono)}
+.spec-editor{margin:12px 0;overflow:hidden;border:1px solid var(--line-2);border-radius:var(--r2);background:var(--surface)}
+.spec-editor>summary{padding:10px 16px;border-bottom:1px solid var(--line);background:var(--surface-2)}
+.spec-body{padding:16px}
+.acceptance-list{display:grid;gap:8px;margin-bottom:10px}
+.acceptance-row{display:grid;grid-template-columns:80px 125px minmax(170px,1.3fr) minmax(180px,1fr) auto;align-items:center;gap:8px}
+.manual-hint{padding:8px 12px;border-radius:var(--r2);background:var(--surface-2);color:var(--muted);font-size:12.5px}
+.spec-body .check-label{margin:4px 0 14px}
+.adjudication-panel{border-top:3px solid var(--s-astra)}
+.adjudication-meta{display:flex;align-items:center;flex-wrap:wrap;gap:8px 16px;margin-bottom:12px;padding:8px 12px;border:1px solid var(--line);border-radius:var(--r2);background:var(--surface-2);color:var(--ink-2);font-size:12.5px}
+.adjudication-recommendation{display:grid;grid-template-columns:minmax(200px,.7fr) minmax(0,1.3fr);gap:16px;padding:12px 16px;border:1px solid var(--line-2);border-radius:var(--r2);background:var(--surface);box-shadow:inset 3px 0 0 var(--s-astra)}
+.adjudication-recommendation>*{min-width:0}
+.adjudication-recommendation span,.adjudication-recommendation strong{display:block}
+.adjudication-recommendation span{margin-bottom:4px;color:var(--s-astra);font-size:12px}
+.adjudication-recommendation strong{font-size:15px}
+.adjudication-recommendation p{margin:0}
+.adjudication-items{display:grid;gap:10px;margin-top:14px}
+.adjudication-items article{padding:12px 14px;border:1px solid var(--line);border-radius:var(--r2);background:var(--surface)}
+.adjudication-items article>div:first-child{display:flex;flex-wrap:wrap;gap:6px}
+.adjudication-items p{margin:8px 0}
+.decision-stack .evidence-list{display:grid;gap:6px;margin:8px 0;padding:0;list-style:none}
+.decision-stack .evidence-list li{display:grid;grid-template-columns:minmax(70px,auto) auto minmax(0,1fr);gap:10px;padding:6px 10px;border-radius:var(--r1);background:var(--surface-2);font-size:12.5px}
+.decision-stack .evidence-list small{color:var(--muted)}
+.decision-stack .evidence-list :is(small,span){min-width:0;overflow-wrap:anywhere}
+.verification-next{display:grid!important;grid-template-columns:auto minmax(0,1fr);gap:10px;padding-top:8px;border-top:1px solid var(--line);font-size:12.5px}
+.adjudication-followup{margin-top:12px;padding:12px 14px;border-radius:var(--r2);background:var(--surface-2)}
+.adjudication-followup ul{margin:6px 0 0}
+.adjudication-followup small{display:block;color:var(--muted)}
+.adjudication-pending{padding:14px 16px;border:1px dashed var(--line-3);border-radius:var(--r2);background:var(--surface-2)}
+.adjudication-pending.bad{border-color:var(--err-line);background:var(--err-bg)}
+.adjudication-pending.warn{border-color:var(--wait-line);background:var(--wait-bg)}
+.adjudication-pending p{margin:6px 0 0}
+
+@container run-pane (min-width:860px){.decision-top.split-view{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@container run-pane (max-width:1050px){.acceptance-row{grid-template-columns:80px 125px minmax(0,1fr)}.acceptance-row>:nth-child(4){grid-column:1/4}.acceptance-row>:last-child{grid-column:3;justify-self:end}.adjudication-recommendation,.decision-stack .evidence-list li{grid-template-columns:minmax(0,1fr)}}
+@container run-pane (max-width:650px){.uncertainty-item{grid-template-columns:auto auto minmax(0,1fr)}.uncertainty-item .impact{grid-column:3}.acceptance-row{grid-template-columns:minmax(0,1fr)}.acceptance-row>*{grid-column:auto!important}.acceptance-row>:last-child{justify-self:start}.verification-next{grid-template-columns:minmax(0,1fr)}}
+.build-budget-editor{display:grid;gap:12px;padding:14px;border:1px solid var(--line);border-radius:var(--r2);background:var(--surface-2)}
+.build-budget-head{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.build-budget-head small{color:var(--muted)}
+.budget-fields{grid-template-columns:repeat(4,minmax(110px,1fr))}
+@media (max-width:760px){.budget-fields{grid-template-columns:repeat(2,minmax(0,1fr))}}

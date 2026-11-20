@@ -1,0 +1,70 @@
+/* Demo pill (README.md "Demo chrome"). Light theme with the app's own tokens (and fallbacks for the moment before the
+   product stylesheet loads). The product's "mock" tone marks preset content; ▶ 播放 is the one ink action.
+   Height 22px: it sits inside the 28px status bar (pill.ts PILL_H). Always position:fixed (pill.ts explains why);
+   data-place is corner (default), docked (right/top set inline) or banner (top strip on narrow screens). */
+.mawb-demo-pill{
+  position:fixed;z-index:70;right:12px;bottom:3px;
+  display:flex;align-items:center;gap:6px;height:22px;padding:0 3px 0 9px;
+  border:1px dashed var(--mock-line,#b0a97c);border-radius:999px;background:var(--mock-bg,#f7f6ef);color:var(--mock-ink,#4f4b2c);
+  font:12px/1 var(--font,"Segoe UI","Microsoft YaHei UI",system-ui,sans-serif);white-space:nowrap;
+}
+.mawb-demo-pill[data-place=docked]{bottom:auto}
+.mawb-demo-pill[data-place=banner]{top:2px;right:auto;bottom:auto;left:8px}
+.mawb-demo-strip{position:fixed;z-index:69;top:0;right:0;left:0;height:26px;border-bottom:1px solid var(--line-2,#d6dae3);background:var(--side-bg,#f4f5f8)}
+/* banner: the app frame moves down by the strip's height, so the strip covers nothing */
+:root[data-mawb-banner=true] .app{top:26px}
+@media (max-height:599px){:root[data-mawb-banner=true] .app{top:auto;margin-top:26px}}
+.mawb-demo-pill *,.mawb-demo-pill *::before,.mawb-demo-pill *::after{box-sizing:border-box}
+.mawb-demo-pill [hidden]{display:none!important}
+
+.mdp-badge{display:inline-flex;align-items:center;gap:6px;min-width:0}
+.mdp-dot{flex:none;width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.7}
+.mdp-label{white-space:nowrap}
+.mdp-label-head{font-weight:600}
+.mdp-label-tail{font-weight:400}
+.mdp-gate{display:inline-flex;align-items:center;height:16px;padding:0 8px;border-left:1px solid var(--mock-line,#b0a97c);color:var(--gate-ink,#40527f);font-weight:600}
+.mdp-body{display:inline-flex;align-items:center;gap:4px}
+
+.mawb-demo-pill button,.mawb-demo-pill a{
+  display:inline-flex;align-items:center;justify-content:center;height:16px;min-height:0;margin:0;padding:0 7px;
+  border:1px solid transparent;border-radius:999px;background:none;color:inherit;font:inherit;line-height:1;text-decoration:none;cursor:pointer;
+  transition:background-color 150ms,border-color 150ms,color 150ms;
+}
+.mawb-demo-pill button:hover,.mawb-demo-pill a:hover{background:rgba(79,75,44,.09)}
+.mawb-demo-pill button:focus-visible,.mawb-demo-pill a:focus-visible{outline:2px solid var(--ink,#293553);outline-offset:1px}
+.mawb-demo-pill .mdp-play,.mawb-demo-pill .mdp-send{background:var(--ink,#293553);color:var(--on-dark,#fff);font-weight:600}
+.mawb-demo-pill .mdp-play:hover,.mawb-demo-pill .mdp-send:hover{background:var(--ink-hover,#1f2942)}
+.mdp-speed{display:inline-flex;align-items:center;height:16px;border:1px solid var(--mock-line,#b0a97c);border-radius:999px;overflow:hidden}
+.mawb-demo-pill .mdp-speed-btn{height:14px;padding:0 5px;border:0;border-radius:0;font-family:var(--mono,Consolas,monospace);font-size:11.5px}
+.mawb-demo-pill .mdp-speed-btn[aria-pressed=true]{background:var(--mock-ink,#4f4b2c);color:var(--mock-bg,#f7f6ef)}
+.mawb-demo-pill .mdp-more{padding:0 5px;font-weight:600}
+.mawb-demo-pill .mdp-toggle{width:16px;padding:0;font-size:14px}
+
+/* the "⋯" menu: opens upwards from the pill, right-aligned */
+.mdp-menu{
+  position:absolute;right:0;bottom:calc(100% + 6px);display:grid;gap:8px;width:max-content;max-width:min(440px,calc(100vw - 24px));padding:10px 12px;
+  border:1px solid var(--glass-line,rgba(150,163,191,.55));border-radius:var(--r3,6px);background:var(--surface,#fff);
+  color:var(--ink,#293553);box-shadow:var(--e1,0 10px 22px -12px rgba(41,53,83,.3));white-space:normal;
+}
+.mdp-menu-head{margin:0;color:var(--mock-ink,#4f4b2c);font-size:12px;font-weight:600;line-height:1.5}
+.mdp-menu-gate{margin:0;color:var(--gate-ink,#40527f);font-size:12px;font-weight:600;line-height:1.5}
+.mdp-menu-items{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px}
+.mdp-menu-items>a{color:var(--ink-2,#475674)}
+
+/* toast: above the pill, right-aligned, no backdrop-filter (tokens.css: glass without blur over the canvas) */
+.mdp-toast{
+  position:absolute;right:0;bottom:calc(100% + 8px);width:max-content;max-width:min(420px,calc(100vw - 24px));padding:8px 12px;
+  border:1px solid var(--glass-line,rgba(150,163,191,.55));border-radius:var(--r3,6px);background:var(--glass-strong-bg,rgba(255,255,255,.9));
+  color:var(--ink,#293553);font-size:12.5px;line-height:1.5;white-space:normal;box-shadow:var(--e1,0 10px 22px -12px rgba(41,53,83,.3));
+  animation:mdp-in 180ms cubic-bezier(.16,1,.3,1);
+}
+@keyframes mdp-in{from{opacity:0;transform:translateY(4px)}}
+/* in the banner the menu and the toast open downwards, left-aligned with the pill */
+.mawb-demo-pill[data-place=banner] :is(.mdp-menu,.mdp-toast){top:calc(100% + 8px);right:auto;bottom:auto;left:0}
+
+@media (prefers-reduced-motion:reduce){
+  .mawb-demo-pill button,.mawb-demo-pill a{transition:none}
+  .mdp-toast{animation:none}
+}
+:root[data-motion=reduce] .mawb-demo-pill button,:root[data-motion=reduce] .mawb-demo-pill a{transition:none}
+:root[data-motion=reduce] .mdp-toast{animation:none}

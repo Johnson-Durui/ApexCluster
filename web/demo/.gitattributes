@@ -1,0 +1,7 @@
+# RoomDesk deliverables. Their exact bytes are pinned by sha256 in scenario/content/manifest.json,
+# so git must never convert their line endings on checkout.
+scenario/content/** text eol=lf
+public/demo-project/** text eol=lf
+public/demo-project/*.zip binary
+# Generated scenario files; the artifact records hash the bytes the page serves, so keep them LF.
+scenario/content-extra/** text eol=lf

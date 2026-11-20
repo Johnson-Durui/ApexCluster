@@ -1,0 +1,293 @@
+{
+  "version": 1,
+  "models": [
+    {
+      "id": "claude-fable-5-2",
+      "provider": "anthropic",
+      "family": "anthropic",
+      "protocol": "anthropic-messages",
+      "apiKeyEnv": "ANTHROPIC_API_KEY",
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "efforts": ["low", "medium", "high", "xhigh", "max"],
+      "pricing": {
+        "asOf": "2026-11-17",
+        "inputPerMTok": 8,
+        "outputPerMTok": 40
+      }
+    },
+    {
+      "id": "claude-opus-5-5",
+      "provider": "anthropic",
+      "family": "anthropic",
+      "protocol": "anthropic-messages",
+      "apiKeyEnv": "ANTHROPIC_API_KEY",
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "efforts": ["low", "medium", "high", "xhigh", "max"],
+      "pricing": {
+        "asOf": "2026-11-17",
+        "inputPerMTok": 4,
+        "outputPerMTok": 20
+      }
+    },
+    {
+      "id": "claude-sonnet-5-5",
+      "provider": "anthropic",
+      "family": "anthropic",
+      "protocol": "anthropic-messages",
+      "apiKeyEnv": "ANTHROPIC_API_KEY",
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "efforts": ["low", "medium", "high", "xhigh", "max"],
+      "pricing": {
+        "asOf": "2026-11-17",
+        "inputPerMTok": 2,
+        "outputPerMTok": 10
+      }
+    },
+    {
+      "id": "claude-haiku-5-5",
+      "provider": "anthropic",
+      "family": "anthropic",
+      "protocol": "anthropic-messages",
+      "apiKeyEnv": "ANTHROPIC_API_KEY",
+      "contextWindow": 1000000,
+      "maxOutputTokens": 128000,
+      "efforts": ["low", "medium", "high", "xhigh", "max"],
+      "pricing": {
+        "asOf": "2026-11-17",
+        "inputPerMTok": 0.1,
+        "cachedInputPerMTok": 0.01,
+        "cacheWritePerMTok": 0.125,
+        "outputPerMTok": 0.5,
+        "longContext": {
+          "aboveInputTokens": 100000,
+          "inputMultiplier": 5,
+          "outputMultiplier": 5
+        }
+      }
+    },
+    {
+      "id": "gpt-6.2-astra",
+      "provider": "openai",
+      "family": "openai",
+      "protocol": "openai-responses",
+      "apiKeyEnv": "OPENAI_API_KEY",
+      "contextWindow": 1050000,
+      "maxInputTokens": 922000,
+      "maxOutputTokens": 128000,
+      "efforts": ["low", "medium", "high", "xhigh", "max"],
+      "pricing": {
+        "asOf": "2026-11-18",
+        "inputPerMTok": 8,
+        "cachedInputPerMTok": 0.4,
+        "cacheWritePerMTok": 10,
+        "outputPerMTok": 40,
+        "longContext": {
+          "aboveInputTokens": 272000,
+          "inputMultiplier": 2,
+          "outputMultiplier": 1.5
+        }
+      }
+    },
+    {
+      "id": "gpt-6.2-sol",
+      "provider": "openai",
+      "family": "openai",
+      "protocol": "openai-responses",
+      "apiKeyEnv": "OPENAI_API_KEY",
+      "contextWindow": 1050000,
+      "maxInputTokens": 922000,
+      "maxOutputTokens": 128000,
+      "efforts": ["low", "medium", "high", "xhigh", "max"],
+      "pricing": {
+        "asOf": "2026-11-18",
+        "inputPerMTok": 2,
+        "cachedInputPerMTok": 0.1,
+        "cacheWritePerMTok": 2.5,
+        "outputPerMTok": 10,
+        "longContext": {
+          "aboveInputTokens": 272000,
+          "inputMultiplier": 2,
+          "outputMultiplier": 1.5
+        }
+      }
+    },
+    {
+      "id": "gpt-6-astra",
+      "provider": "openai",
+      "family": "openai",
+      "protocol": "openai-responses",
+      "apiKeyEnv": "OPENAI_API_KEY",
+      "contextWindow": 1050000,
+      "maxInputTokens": 922000,
+      "maxOutputTokens": 128000,
+      "efforts": ["low", "medium", "high", "xhigh", "max"],
+      "pricing": {
+        "asOf": "2026-11-17",
+        "inputPerMTok": 10,
+        "cachedInputPerMTok": 1,
+        "cacheWritePerMTok": 12.5,
+        "outputPerMTok": 50,
+        "longContext": {
+          "aboveInputTokens": 272000,
+          "inputMultiplier": 2,
+          "outputMultiplier": 1.5
+        }
+      }
+    },
+    {
+      "id": "gpt-6.1-sol",
+      "provider": "openai",
+      "family": "openai",
+      "protocol": "openai-responses",
+      "apiKeyEnv": "OPENAI_API_KEY",
+      "contextWindow": 1050000,
+      "maxInputTokens": 922000,
+      "maxOutputTokens": 128000,
+      "efforts": ["low", "medium", "high", "xhigh", "max"],
+      "pricing": {
+        "asOf": "2026-11-17",
+        "inputPerMTok": 2,
+        "cachedInputPerMTok": 0.1,
+        "cacheWritePerMTok": 2.5,
+        "outputPerMTok": 10,
+        "longContext": {
+          "aboveInputTokens": 272000,
+          "inputMultiplier": 2,
+          "outputMultiplier": 1.5
+        }
+      }
+    },
+    {
+      "id": "gpt-6.1-terra",
+      "provider": "openai",
+      "family": "openai",
+      "protocol": "openai-responses",
+      "apiKeyEnv": "OPENAI_API_KEY",
+      "contextWindow": 1050000,
+      "maxInputTokens": 922000,
+      "maxOutputTokens": 128000,
+      "efforts": ["none", "low", "medium", "high", "xhigh", "max"],
+      "pricing": {
+        "asOf": "2026-11-17",
+        "inputPerMTok": 1,
+        "outputPerMTok": 5,
+        "longContext": {
+          "aboveInputTokens": 272000,
+          "inputMultiplier": 2,
+          "outputMultiplier": 1.5
+        }
+      }
+    },
+    {
+      "id": "gpt-6-luna",
+      "provider": "openai",
+      "family": "openai",
+      "protocol": "openai-responses",
+      "apiKeyEnv": "OPENAI_API_KEY",
+      "contextWindow": 1050000,
+      "maxInputTokens": 922000,
+      "maxOutputTokens": 128000,
+      "efforts": ["none", "low", "medium", "high", "xhigh", "max"],
+      "pricing": {
+        "asOf": "2026-11-17",
+        "inputPerMTok": 0.1,
+        "cachedInputPerMTok": 0.01,
+        "cacheWritePerMTok": 0.125,
+        "outputPerMTok": 0.5,
+        "longContext": {
+          "aboveInputTokens": 272000,
+          "inputMultiplier": 2,
+          "outputMultiplier": 1.5
+        }
+      }
+    },
+    {
+      "id": "gemini-4-carbon",
+      "provider": "google",
+      "family": "google",
+      "protocol": "google-genai",
+      "apiKeyEnv": "GEMINI_API_KEY",
+      "contextWindow": 1048576,
+      "maxOutputTokens": 1048576,
+      "efforts": ["low", "medium", "high"],
+      "pricing": {
+        "asOf": "2026-11-17",
+        "inputPerMTok": 4,
+        "outputPerMTok": 20
+      }
+    },
+    {
+      "id": "gemini-4-hydrogen",
+      "provider": "google",
+      "family": "google",
+      "protocol": "google-genai",
+      "apiKeyEnv": "GEMINI_API_KEY",
+      "contextWindow": 1048576,
+      "maxOutputTokens": 1048576,
+      "efforts": ["low", "medium", "high", "xhigh"],
+      "pricing": {
+        "asOf": "2026-11-17",
+        "inputPerMTok": 1.5,
+        "outputPerMTok": 7.5
+      }
+    },
+    {
+      "id": "grok-4.7",
+      "provider": "xai",
+      "family": "xai",
+      "protocol": "openai-responses",
+      "baseUrl": "https://api.x.ai/v1",
+      "apiKeyEnv": "XAI_API_KEY",
+      "contextWindow": 500000,
+      "maxOutputTokens": 500000,
+      "efforts": ["low", "medium", "high", "xhigh"],
+      "pricing": {
+        "asOf": "2026-11-17",
+        "inputPerMTok": 2,
+        "outputPerMTok": 6,
+        "longContext": {
+          "aboveInputTokens": 199999,
+          "inputMultiplier": 2,
+          "outputMultiplier": 2
+        }
+      }
+    },
+    {
+      "id": "deepseek-v4-pro",
+      "provider": "deepseek",
+      "family": "deepseek",
+      "protocol": "openai-responses",
+      "baseUrl": "https://api.deepseek.com",
+      "apiKeyEnv": "DEEPSEEK_API_KEY",
+      "contextWindow": 1000000,
+      "maxOutputTokens": 384000,
+      "efforts": ["none", "low", "high", "max"],
+      "pricing": {
+        "asOf": "2026-11-17",
+        "inputPerMTok": 1.32,
+        "cachedInputPerMTok": 0.044,
+        "outputPerMTok": 3.96
+      }
+    },
+    {
+      "id": "deepseek-flash",
+      "provider": "deepseek",
+      "family": "deepseek",
+      "protocol": "openai-responses",
+      "baseUrl": "https://api.deepseek.com",
+      "apiKeyEnv": "DEEPSEEK_API_KEY",
+      "contextWindow": 1000000,
+      "maxOutputTokens": 384000,
+      "efforts": ["none", "low", "high", "max"],
+      "pricing": {
+        "asOf": "2026-11-17",
+        "inputPerMTok": 0.3,
+        "cachedInputPerMTok": 0.006,
+        "outputPerMTok": 1.2
+      }
+    }
+  ]
+}

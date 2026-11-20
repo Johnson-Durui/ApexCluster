@@ -1,0 +1,68 @@
+name: dual-model-workbench
+services:
+  document-worker:
+    build:
+      context: ./services/document-worker
+      args:
+        LIBREOFFICE_VERSION: "4:25.2.3-2+deb13u8"
+    image: dual-model-workbench/document-worker:1.1.0
+    init: true
+    read_only: true
+    user: "10001:10001"
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=256m,uid=10001,gid=10001,mode=1770
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 64
+    mem_limit: 1g
+    cpus: 1.5
+    restart: unless-stopped
+    stop_grace_period: 10s
+    networks:
+      - document-worker-internal
+    healthcheck:
+      test: ["CMD", "python", "-c", "import json,urllib.request; d=json.load(urllib.request.urlopen('http://127.0.0.1:18781/health',timeout=2)); assert d['status']=='ok'"]
+      interval: 10s
+      timeout: 3s
+      start_period: 30s
+      retries: 6
+
+  document-worker-gateway:
+    image: dual-model-workbench/document-worker:1.1.0
+    command: ["python", "-m", "document_worker.proxy"]
+    init: true
+    read_only: true
+    user: "10001:10001"
+    depends_on:
+      document-worker:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:${DOCUMENT_WORKER_PORT:-18781}:18781"
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=16m,uid=10001,gid=10001,mode=1770
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 32
+    mem_limit: 96m
+    cpus: 0.25
+    restart: unless-stopped
+    stop_grace_period: 5s
+    networks:
+      - document-worker-internal
+      - document-worker-ingress
+    healthcheck:
+      test: ["CMD", "python", "-c", "import json,urllib.request; d=json.load(urllib.request.urlopen('http://127.0.0.1:18781/health',timeout=2)); assert d['status']=='ok'"]
+      interval: 10s
+      timeout: 3s
+      start_period: 15s
+      retries: 6
+
+networks:
+  document-worker-internal:
+    internal: true
+  document-worker-ingress:
+    driver: bridge

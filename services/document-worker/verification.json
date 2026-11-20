@@ -1,0 +1,39 @@
+{
+  "verifiedAt": "2026-11-04T02:16:32+08:00",
+  "health": "ok",
+  "hostEndpoint": "http://127.0.0.1:18781",
+  "implementationSha256": "b89ab4d8833e30c1bc3c4aab2e1819e5c6f897477ad6405f0482150438ede169",
+  "implementationHashMatchedHost": true,
+  "containerTests": {
+    "passed": 9,
+    "failed": 0,
+    "network": "none",
+    "rootFilesystemReadOnly": true
+  },
+  "network": {
+    "workerNetworkInternal": true,
+    "workerEgressBlocked": true,
+    "workerPublishedPorts": [],
+    "gatewayLoopbackBinding": "127.0.0.1:18781"
+  },
+  "smoke": {
+    "outputDirectory": "./work/document-worker-smoke",
+    "chineseRoundTrip": true,
+    "createdFormats": ["docx", "xlsx", "pptx", "md", "html"],
+    "convertedPdfCount": 3,
+    "pdfPages": [1, 1, 2],
+    "archiveCreated": true,
+    "imageInfoDecoded": true,
+    "renderQualityInspected": true,
+    "renderReview": "docs/verification/course-render-evidence.json"
+  },
+  "archiveBoundary": {
+    "httpEntriesAccepted": 200,
+    "httpArchiveSha256": "d633f2477171741f8bf1e26307e73d8ac6978deee0591e4736db3dbd9e4ef7f6",
+    "archiveMaxFiles": 200,
+    "defaultMaxFiles": 10,
+    "archiveExpandedBytesLimit": 47185920,
+    "requestBytesLimit": 62914560,
+    "fileBytesLimit": 20971520
+  }
+}

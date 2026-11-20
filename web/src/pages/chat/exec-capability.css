@@ -1,0 +1,5 @@
+/* Exec capability notice (Settings, Environment). The chat page no longer renders it: the sandbox lives in the status bar. */
+.exec-capability{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin:8px 0;padding:8px 12px;border:1px solid var(--line-2);border-radius:var(--r2);background:var(--surface);color:var(--ink-2);font-size:var(--fs-dense);overflow-wrap:anywhere}
+.exec-capability strong{color:var(--ink);font-weight:600}
+.exec-capability.is-unsafe{background:var(--wait-bg);border-color:var(--wait-line);color:var(--wait)}
+.exec-capability.is-unsafe strong{color:var(--wait)}

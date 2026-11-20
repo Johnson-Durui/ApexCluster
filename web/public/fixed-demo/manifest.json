@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "scenarioId": "roomdesk-v1",
+  "prompt": "帮我做一个团队会议室预约小工具：先出 PRD 和技术架构，再完成可运行的 Web 应用和自动化测试。需要支持按楼层筛选、冲突检测和 iCal 导出。",
+  "artifacts": [
+    {
+      "id": "prd",
+      "name": "PRD.md",
+      "url": "/fixed-demo/prd.md",
+      "bytes": 4764,
+      "hash": "0b8d4cbef633f4a6c939d61e29c15e5b84361c68dd66d177a0427a876a3f1ed1"
+    },
+    {
+      "id": "architecture",
+      "name": "ARCHITECTURE.md",
+      "url": "/fixed-demo/architecture.md",
+      "bytes": 6026,
+      "hash": "86c0a0b328b741c81eb1d46ab0a4f5d038b9e6c7bd03202965546a5e2e200614"
+    },
+    {
+      "id": "source",
+      "name": "roomdesk-core.mjs",
+      "url": "/fixed-demo/source.mjs",
+      "bytes": 22932,
+      "hash": "7aad5c24838b00406f50c158b43aabeea2bf9f8ded91e09ef04121d740d5d906"
+    },
+    {
+      "id": "tests",
+      "name": "TEST_REPORT.txt",
+      "url": "/fixed-demo/tests.txt",
+      "bytes": 2950,
+      "hash": "71c00f7f256bc6e8c87cd33b763f674dfec93b266b0a5cc1c8fcd9e6450aa578"
+    },
+    {
+      "id": "project",
+      "name": "roomdesk.zip",
+      "url": "/fixed-demo/project.zip",
+      "bytes": 47902,
+      "hash": "cbcc97f62f424f6c8ef7d955559d31c69c576f21cff11d4c0267c505bf06f0dd"
+    }
+  ],
+  "productUrl": "/fixed-demo/project/index.html"
+}

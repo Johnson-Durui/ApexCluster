@@ -1,0 +1,128 @@
+[
+  {
+    "id": "prd",
+    "name": "PRD.md",
+    "relativePath": "docs/PRD.md",
+    "source": "scenario/content/prd.md",
+    "kind": "file",
+    "bytes": 4764,
+    "sha256": "0b8d4cbef633f4a6c939d61e29c15e5b84361c68dd66d177a0427a876a3f1ed1"
+  },
+  {
+    "id": "architecture",
+    "name": "ARCHITECTURE.md",
+    "relativePath": "docs/ARCHITECTURE.md",
+    "source": "scenario/content/architecture.md",
+    "kind": "file",
+    "bytes": 6026,
+    "sha256": "86c0a0b328b741c81eb1d46ab0a4f5d038b9e6c7bd03202965546a5e2e200614"
+  },
+  {
+    "id": "dev-guide",
+    "name": "DEV_GUIDE.md",
+    "relativePath": "docs/DEV_GUIDE.md",
+    "source": "scenario/content/dev-guide.md",
+    "kind": "file",
+    "bytes": 4273,
+    "sha256": "061db785c4b00dcffb289e16991885dd1832a5b36435042c47cf8dcb59f01322"
+  },
+  {
+    "id": "acceptance",
+    "name": "ACCEPTANCE.md",
+    "relativePath": "docs/ACCEPTANCE.md",
+    "source": "scenario/content/acceptance.md",
+    "kind": "report",
+    "bytes": 5931,
+    "sha256": "bf297163822d581f36d7542f06e99ecfd743a09c663464f24518737427b56070"
+  },
+  {
+    "id": "trace",
+    "name": "TRACE.md",
+    "relativePath": "docs/TRACE.md",
+    "source": "scenario/content/trace.md",
+    "kind": "file",
+    "bytes": 5967,
+    "sha256": "7877641824d429a9744f8e62dadce16a5e0405c43aa1042381c58689411c69fd"
+  },
+  {
+    "id": "index",
+    "name": "index.html",
+    "relativePath": "index.html",
+    "source": "public/demo-project/index.html",
+    "kind": "file",
+    "bytes": 6004,
+    "sha256": "b81d7e7f7dd3f4eb9c882bbba846ee09c2d2f774f0d3e151dacc15883b4f2c57"
+  },
+  {
+    "id": "app",
+    "name": "app.js",
+    "relativePath": "src/app.js",
+    "source": "public/demo-project/src/app.js",
+    "kind": "file",
+    "bytes": 23304,
+    "sha256": "d024a603453f9ab11f03c4c456bbff82bb6432761951dbc959069de53d883d08"
+  },
+  {
+    "id": "core",
+    "name": "roomdesk-core.mjs",
+    "relativePath": "src/roomdesk-core.mjs",
+    "source": "public/demo-project/src/roomdesk-core.mjs",
+    "kind": "file",
+    "bytes": 22932,
+    "sha256": "7aad5c24838b00406f50c158b43aabeea2bf9f8ded91e09ef04121d740d5d906"
+  },
+  {
+    "id": "styles",
+    "name": "styles.css",
+    "relativePath": "src/styles.css",
+    "source": "public/demo-project/src/styles.css",
+    "kind": "file",
+    "bytes": 15430,
+    "sha256": "e71359e24cf9c9939ca52c6b18145d6b85db12b31b7cf6f3c9738c03721b1a19"
+  },
+  {
+    "id": "tests",
+    "name": "roomdesk-core-test.mjs",
+    "relativePath": "tests/roomdesk-core-test.mjs",
+    "source": "public/demo-project/tests/roomdesk-core-test.mjs",
+    "kind": "test",
+    "bytes": 15035,
+    "sha256": "6af2d2210e06d55ddebb9e430868168fe59ed4ad823be4787dd0a370bbcb4c97"
+  },
+  {
+    "id": "readme",
+    "name": "README.md",
+    "relativePath": "README.md",
+    "source": "public/demo-project/README.md",
+    "kind": "file",
+    "bytes": 1947,
+    "sha256": "b50b7967258e50974f84bf41116452f6a380995573e4598783038c021a4ccd6a"
+  },
+  {
+    "id": "package",
+    "name": "package.json",
+    "relativePath": "package.json",
+    "source": "public/demo-project/package.json",
+    "kind": "file",
+    "bytes": 311,
+    "sha256": "1b7dfeb4b17d74b9f4b3f4e1695b43fda77f637d528e17873a3177593cc6c86e"
+  },
+  {
+    "id": "test-report",
+    "name": "TEST_REPORT.txt",
+    "relativePath": "TEST_REPORT.txt",
+    "source": "scenario/content/test-report.txt",
+    "kind": "report",
+    "bytes": 2950,
+    "sha256": "71c00f7f256bc6e8c87cd33b763f674dfec93b266b0a5cc1c8fcd9e6450aa578"
+  },
+  {
+    "id": "zip",
+    "name": "roomdesk.zip",
+    "relativePath": "roomdesk.zip",
+    "source": "public/demo-project/roomdesk.zip",
+    "kind": "file",
+    "bytes": 47902,
+    "sha256": "cbcc97f62f424f6c8ef7d955559d31c69c576f21cff11d4c0267c505bf06f0dd"
+  }
+]

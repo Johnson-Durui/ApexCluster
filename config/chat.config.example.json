@@ -1,0 +1,15 @@
+{
+  "driverMode": "api",
+  "dataRoot": "./data/chat",
+  "gates": { "clarify": "user", "architecture": "user", "delivery": "user" },
+  "context": {
+    "seats": { "softTokens": 160000, "hardTokens": 240000, "initialMaxTokens": 40000, "maxOutputTokens": 64000, "maxToolActions": 120, "maxMinutes": 45 },
+    "pools": { "softTokens": 64000, "hardTokens": 96000, "initialMaxTokens": 24000, "maxOutputTokens": 32000, "maxToolActions": 80, "maxMinutes": 30 },
+    "overrides": {},
+    "hardRatio": 0.5
+  },
+  "scheduler": { "seatConcurrency": 6, "fanoutMaxItemsPerCall": 1000 },
+  "budget": { "maxUsd": 20, "maxTokens": null },
+  "recovery": { "autoResume": false },
+  "quality": { "crossReview": true, "maxReworkRounds": 2, "clusterCrossRounds": 1 }
+}

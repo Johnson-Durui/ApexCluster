@@ -1,0 +1,19 @@
+/* Fixed demo (BUILD-SPEC-B §4.8): the 40px thread band and the product dialog. Labelled preset playback, dashed --mock tag. */
+.fixed-demo-banner{display:flex;align-items:center;gap:12px;height:var(--strip-h);padding:0 var(--gutter);border-bottom:1px solid var(--line);background:var(--mock-bg);color:var(--ink-2);font-size:var(--fs-dense);min-width:0}
+.fixed-demo-title{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fixed-demo-clock{flex:none;color:var(--ink);font-size:12px;white-space:nowrap}
+.fixed-demo-banner progress{flex:1 1 60px;min-width:40px;height:4px;border:0;border-radius:2px;appearance:none;background:var(--line);overflow:hidden}
+.fixed-demo-banner progress::-webkit-progress-bar{background:var(--line)}
+.fixed-demo-banner progress::-webkit-progress-value{background:var(--ink)}
+.fixed-demo-banner progress::-moz-progress-bar{background:var(--ink)}
+.fixed-demo-controls{display:flex;align-items:center;gap:4px;flex:none;white-space:nowrap}
+.fixed-demo-ended{padding:0 6px;color:var(--muted)}
+@container thread (max-width:560px){.fixed-demo-title{display:none}}
+
+.modal.fixed-demo-product-dialog{width:min(1510px,calc(100vw - 48px));max-height:calc(100vh - 32px)}
+.fixed-demo-product-dialog .modal-body{padding:0;overflow:hidden}
+.fixed-demo-product-note{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 18px;border-bottom:1px solid var(--line);background:var(--mock-bg);color:var(--mock-ink);font-size:12px}
+.fixed-demo-product-note>div{display:flex;gap:6px}
+.fixed-demo-product-frame{display:block;width:100%;height:calc(100vh - 170px);min-height:480px;border:0;background:var(--surface-2)}
+.fixed-demo-product-error{margin:0;padding:30px;color:var(--err)}
+.fixed-demo-product-loading{margin:0;padding:45px;color:var(--muted)}

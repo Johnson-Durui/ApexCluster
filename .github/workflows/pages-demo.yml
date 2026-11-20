@@ -1,0 +1,92 @@
+name: Online demo
+
+# Builds the static online demo (web/demo: the real web UI driven by preset, synthetic data; no backend,
+# no API keys, no model calls) and publishes it to GitHub Pages.
+# One-time repository setup: Settings → Pages → Build and deployment → Source: "GitHub Actions".
+#
+# Every push and pull request that touches the demo's inputs runs the build job, so product text drift (the demo
+# rewrites a few product strings and fails when one changed; see web/demo/vite.config.ts REPLACEMENTS) shows up
+# before it reaches main. Only a push to main (or a manual run on main) uploads and deploys.
+
+on:
+  push:
+    branches: ['**']
+    paths:
+      - 'web/**'
+      - 'src/core/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/pages-demo.yml'
+  pull_request:
+    paths:
+      - 'web/**'
+      - 'src/core/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/pages-demo.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One build per ref; a branch or pull-request build never cancels a main deploy.
+concurrency:
+  group: pages-demo-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            web/package-lock.json
+      - name: Check that the redesigned web UI is present
+        # web/demo builds the redesigned web UI. These product files are imported or rewritten by the demo; without
+        # them typecheck:demo and build:demo fail with less obvious errors.
+        run: |
+          for file in web/src/pages/new/environmentModel.ts web/src/pages/chat/Welcome.tsx web/src/pages/chat/composer/Composer.tsx web/src/pages/chat/thread/FixedDemoBar.tsx; do
+            if [ ! -f "$file" ]; then
+              echo "::error file=$file::$file is missing. web/demo needs the redesigned web UI (web/src and web/public); push it together with web/demo."
+              exit 1
+            fi
+          done
+      # The root install provides zod and @types/node: web/src/lib/types.ts re-exports types from src/core, which
+      # typecheck:demo follows.
+      - run: npm ci
+      - run: npm ci --prefix web
+      - run: npm --prefix web run typecheck:demo
+      - run: npm --prefix web run build:demo
+      # Fails closed: no upload when the built site contains a forbidden or private string (no browser needed).
+      - run: node web/demo/scripts/verify-demo.mjs "${{ runner.temp }}/demo-scan" --scan-only
+      - if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/configure-pages@v5
+      - if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: web/dist-demo
+
+  deploy:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages-deploy
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

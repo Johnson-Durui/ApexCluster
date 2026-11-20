@@ -1,0 +1,18 @@
+/* DEV-only stand-in workspace for #/dev/inspector: thread | map pane (head · rail · stage · dock) | column inspector. */
+.insp-preview{display:grid;grid-template-columns:clamp(400px,44%,700px) minmax(0,1fr);height:100%;min-height:0;background:var(--pane)}
+.insp-preview[data-placement=column]{grid-template-columns:clamp(400px,44%,700px) minmax(0,1fr) var(--insp-w)}
+.insp-preview-thread{display:grid;align-content:start;gap:10px;min-width:0;padding:22px var(--gutter);border-right:1px solid var(--line-2)}
+.insp-preview-thread h2{margin:0}
+.insp-preview-row{display:flex;flex-wrap:wrap;gap:6px}
+.insp-preview-row a[aria-current=page]{border-color:var(--ink)}
+.insp-preview-map{display:flex;flex-direction:column;min-width:0;min-height:0;background:var(--mist-0)}
+.insp-preview-head{flex:none;display:flex;align-items:center;height:var(--deck-head-h);padding:0 16px;border-bottom:1px solid var(--line);background:var(--surface);color:var(--muted);font-size:var(--fs-dense)}
+.insp-preview-rail{flex:none;display:flex;align-items:center;height:var(--rail-h);padding:0 16px;border-bottom:1px solid var(--line);color:var(--muted);font:var(--fs-dense) var(--mono)}
+.insp-preview-stage{flex:1;min-height:var(--stage-min);display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:8px;padding:24px;background:var(--mist)}
+.insp-preview-stage .btn{gap:6px;background:var(--paper)}
+.insp-preview-settings{display:grid;grid-template-columns:200px minmax(0,1fr);height:100%;min-height:0}
+.insp-preview-settings>nav{display:grid;align-content:start;gap:2px;padding:16px 10px 16px 16px;border-right:1px solid var(--line);background:var(--side-bg)}
+.insp-preview-settings>nav button{justify-content:flex-start;height:30px;padding:0 8px;border-radius:var(--r2);color:var(--ink-2);font-size:var(--fs-ui)}
+.insp-preview-settings>nav button:hover{background:var(--hover)}
+.insp-preview-settings>nav p{margin:8px 8px 4px;font-size:var(--fs-meta)}
+.insp-preview-settings-main{min-width:0;min-height:0;overflow:auto;padding:18px var(--gutter) 0}
