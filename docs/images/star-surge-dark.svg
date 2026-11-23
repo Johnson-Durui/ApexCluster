@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="380" viewBox="0 0 800 380" role="img" aria-label="ApexCluster star history: 0 to 149 stars in under 4 days">
+<defs>
+  <linearGradient id="stroke" gradientUnits="userSpaceOnUse" x1="303.0664971751412" x2="760" y1="0" y2="0">
+    <stop offset="0" stop-color="#24d4b0"/><stop offset=".35" stop-color="#42b8ff"/><stop offset=".7" stop-color="#a364ff"/><stop offset="1" stop-color="#ff5e92"/>
+  </linearGradient>
+  <linearGradient id="fill" x1="0" x2="0" y1="0" y2="1">
+    <stop offset="0" stop-color="#a364ff" stop-opacity="0.35"/><stop offset="1" stop-color="#42b8ff" stop-opacity="0"/>
+  </linearGradient>
+  <linearGradient id="num" x1="0" x2="1"><stop offset="0" stop-color="#42b8ff"/><stop offset=".5" stop-color="#a364ff"/><stop offset="1" stop-color="#ff5e92"/></linearGradient>
+  <clipPath id="reveal"><rect x="64" y="0" width="716" height="380"><animate attributeName="width" from="0" to="716" dur="2.4s" begin="0s" fill="freeze" calcMode="spline" keySplines=".4 0 .2 1" keyTimes="0;1"/></rect></clipPath>
+  <style>
+    text{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans',Helvetica,Arial,sans-serif}
+    .ax{font-size:12px;fill:#8b949e}
+    .lab{font-size:12px;fill:#8b949e;letter-spacing:.08em}
+    .ann{font-size:13px;font-weight:600;fill:#e6edf3}
+    .pulse{transform-origin:760.0px 126.2px;animation:p 2s ease-out 2.6s infinite;opacity:0}
+    @keyframes p{0%{transform:scale(1);opacity:.55}100%{transform:scale(3.2);opacity:0}}
+    .late{animation:f .6s ease 2.4s backwards}
+    @keyframes f{from{opacity:0}to{opacity:1}}
+  </style>
+</defs>
+<rect x=".5" y=".5" width="799" height="379" rx="14" fill="#0d1117" stroke="#30363d"/>
+<text x="32" y="40" class="lab">★ STAR HISTORY · APEXCLUSTER</text>
+<text x="32" y="86" font-size="44" font-weight="700" fill="url(#num)">149</text>
+<text x="124" y="70" font-size="15" font-weight="600" fill="#e6edf3">stars in under 4 days</text>
+<text x="124" y="88" font-size="13" fill="#8b949e">0 → 149 since the first star on Nov 20</text>
+<g transform="translate(564 34)">
+  <rect width="196" height="52" rx="10" fill="#161b22" stroke="#30363d"/>
+  <text x="16" y="22" class="lab">PEAK VELOCITY</text>
+  <text x="16" y="42" font-size="17" font-weight="700" fill="#e6edf3">+28 ★ <tspan font-size="13" font-weight="400" fill="#8b949e">in a single hour</tspan></text>
+</g>
+<line x1="64" x2="760" y1="318" y2="318" stroke="#21262d" /><text x="52" y="322" text-anchor="end" class="ax">0</text><line x1="64" x2="760" y1="253.625" y2="253.625" stroke="#21262d" stroke-dasharray="3 5"/><text x="52" y="257.625" text-anchor="end" class="ax">50</text><line x1="64" x2="760" y1="189.25" y2="189.25" stroke="#21262d" stroke-dasharray="3 5"/><text x="52" y="193.25" text-anchor="end" class="ax">100</text><line x1="64" x2="760" y1="124.875" y2="124.875" stroke="#21262d" stroke-dasharray="3 5"/><text x="52" y="128.875" text-anchor="end" class="ax">150</text><line x1="64" x2="64" y1="318" y2="323" stroke="#30363d"/><text x="64" y="340" text-anchor="middle" class="ax">Nov 19</text><line x1="205.55932203389833" x2="205.55932203389833" y1="318" y2="323" stroke="#30363d"/><text x="205.55932203389833" y="340" text-anchor="middle" class="ax">Nov 20</text><line x1="347.11864406779665" x2="347.11864406779665" y1="318" y2="323" stroke="#30363d"/><text x="347.11864406779665" y="340" text-anchor="middle" class="ax">Nov 21</text><line x1="488.67796610169495" x2="488.67796610169495" y1="318" y2="323" stroke="#30363d"/><text x="488.67796610169495" y="340" text-anchor="middle" class="ax">Nov 22</text><line x1="630.2372881355933" x2="630.2372881355933" y1="318" y2="323" stroke="#30363d"/><text x="630.2372881355933" y="340" text-anchor="middle" class="ax">Nov 23</text>
+<line x1="303.0664971751412" x2="303.0664971751412" y1="106" y2="318" stroke="#8b949e" stroke-dasharray="2 4" class="late"/>
+<text x="295.0664971751412" y="118" text-anchor="end" class="ann late">First star ↘</text>
+<g clip-path="url(#reveal)">
+  <path d="M64.0 318.0L69.9 318.0L75.8 318.0L81.7 318.0L87.6 318.0L93.5 318.0L99.4 318.0L105.3 318.0L111.2 318.0L117.1 318.0L123.0 318.0L128.9 318.0L134.8 318.0L140.7 318.0L146.6 318.0L152.5 318.0L158.4 318.0L164.3 318.0L170.2 318.0L176.1 318.0L182.0 318.0L187.9 318.0L193.8 318.0L199.7 318.0L205.6 318.0L211.5 318.0L217.4 318.0L223.3 318.0L229.2 318.0L235.1 318.0L240.9 318.0L246.8 318.0L252.7 318.0L258.6 318.0L264.5 318.0L270.4 318.0L276.3 318.0L282.2 318.0L288.1 318.0L294.0 318.0L299.9 309.0L305.8 303.8L311.7 300.0L317.6 300.0L323.5 298.7L329.4 297.4L335.3 292.3L341.2 287.1L347.1 287.1L353.0 285.8L358.9 280.7L364.8 276.8L370.7 274.2L376.6 274.2L382.5 271.6L388.4 269.1L394.3 267.8L400.2 266.5L406.1 263.9L412.0 262.6L417.9 262.6L423.8 261.4L429.7 258.8L435.6 258.8L441.5 257.5L447.4 256.2L453.3 253.6L459.2 252.3L465.1 248.5L471.0 248.5L476.9 245.9L482.8 243.3L488.7 239.5L494.6 238.2L500.5 235.6L506.4 233.0L512.3 233.0L518.2 231.7L524.1 230.4L530.0 230.4L535.9 229.2L541.8 229.2L547.7 227.9L553.6 226.6L559.5 226.6L565.4 225.3L571.3 224.0L577.2 224.0L583.1 220.2L588.9 218.9L594.8 215.0L600.7 208.6L606.6 206.0L612.5 197.0L618.4 194.4L624.3 186.7L630.2 182.8L636.1 180.2L642.0 144.2L647.9 141.6L653.8 141.6L659.7 140.3L665.6 139.0L671.5 139.0L677.4 137.8L683.3 137.8L689.2 136.5L695.1 135.2L701.0 135.2L706.9 133.9L712.8 133.9L718.7 132.6L724.6 128.7L730.5 128.7L736.4 127.4L742.3 126.2L748.2 126.2L754.1 126.2L760.0 126.2L760.0 318L64.0 318Z" fill="url(#fill)"/>
+  <path d="M64.0 318.0L69.9 318.0L75.8 318.0L81.7 318.0L87.6 318.0L93.5 318.0L99.4 318.0L105.3 318.0L111.2 318.0L117.1 318.0L123.0 318.0L128.9 318.0L134.8 318.0L140.7 318.0L146.6 318.0L152.5 318.0L158.4 318.0L164.3 318.0L170.2 318.0L176.1 318.0L182.0 318.0L187.9 318.0L193.8 318.0L199.7 318.0L205.6 318.0L211.5 318.0L217.4 318.0L223.3 318.0L229.2 318.0L235.1 318.0L240.9 318.0L246.8 318.0L252.7 318.0L258.6 318.0L264.5 318.0L270.4 318.0L276.3 318.0L282.2 318.0L288.1 318.0L294.0 318.0L299.9 309.0L305.8 303.8L311.7 300.0L317.6 300.0L323.5 298.7L329.4 297.4L335.3 292.3L341.2 287.1L347.1 287.1L353.0 285.8L358.9 280.7L364.8 276.8L370.7 274.2L376.6 274.2L382.5 271.6L388.4 269.1L394.3 267.8L400.2 266.5L406.1 263.9L412.0 262.6L417.9 262.6L423.8 261.4L429.7 258.8L435.6 258.8L441.5 257.5L447.4 256.2L453.3 253.6L459.2 252.3L465.1 248.5L471.0 248.5L476.9 245.9L482.8 243.3L488.7 239.5L494.6 238.2L500.5 235.6L506.4 233.0L512.3 233.0L518.2 231.7L524.1 230.4L530.0 230.4L535.9 229.2L541.8 229.2L547.7 227.9L553.6 226.6L559.5 226.6L565.4 225.3L571.3 224.0L577.2 224.0L583.1 220.2L588.9 218.9L594.8 215.0L600.7 208.6L606.6 206.0L612.5 197.0L618.4 194.4L624.3 186.7L630.2 182.8L636.1 180.2L642.0 144.2L647.9 141.6L653.8 141.6L659.7 140.3L665.6 139.0L671.5 139.0L677.4 137.8L683.3 137.8L689.2 136.5L695.1 135.2L701.0 135.2L706.9 133.9L712.8 133.9L718.7 132.6L724.6 128.7L730.5 128.7L736.4 127.4L742.3 126.2L748.2 126.2L754.1 126.2L760.0 126.2" fill="none" stroke="url(#stroke)" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/>
+</g>
+<circle cx="647.9" cy="144.2" r="4.5" fill="#0d1117" stroke="#a364ff" stroke-width="2.5" class="late"/>
+<text x="635.9" y="148.2" text-anchor="end" class="ann late">+28 ★ / hour</text>
+<circle cx="760.0" cy="126.2" r="6" fill="#ff5e92" class="pulse"/>
+<circle cx="760.0" cy="126.2" r="5.5" fill="#ff5e92" stroke="#0d1117" stroke-width="2" class="late"/>
+<text x="748.0" y="114.2" text-anchor="end" class="ann late">149 ★</text>
+<text x="776" y="366" text-anchor="end" font-size="11" fill="#8b949e">Source: GitHub stargazer events · as of Nov 23, 2026</text>
+</svg>

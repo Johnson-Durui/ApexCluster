@@ -44,6 +44,18 @@
 
 > **核心铁律**：**模型文本无权推进流水线。** 只有程序状态机、`CONTRACT.json` 结构化契约、SHA-256 产物哈希、隔离容器命令回执、跨窗口已读确认与最终 `TRACE`，才能决定交付。
 
+### ⭐ Star 涨势
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/star-surge-dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="docs/images/star-surge.svg" />
+    <img src="docs/images/star-surge.svg" alt="ApexCluster Star 涨势：首颗 star 之后不到 4 天从 0 涨到 149" width="800" />
+  </picture>
+</p>
+
+<p align="center"><sub>首颗 star 之后不到 4 天 0 → 149，单小时峰值 +28 · <a href="https://star-history.com/#Johnson-Durui/ApexCluster&Date">查看实时曲线 →</a></sub></p>
+
 ---
 
 ## 在线演示

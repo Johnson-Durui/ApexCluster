@@ -44,6 +44,18 @@ Orchestrating **Anthropic, OpenAI, Google, xAI, and DeepSeek** across **5 weight
 
 > **Core Invariant**: **Model prose cannot promote the pipeline.** Only durable program state, validated `CONTRACT.json` schemas, SHA-256 artifact hashes, structured command receipts, cross-window read acknowledgements, and final `TRACE` evidence can advance delivery.
 
+### ⭐ Star History
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/star-surge-dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="docs/images/star-surge.svg" />
+    <img src="docs/images/star-surge.svg" alt="ApexCluster star history: 0 to 149 stars in under 4 days after the first star" width="800" />
+  </picture>
+</p>
+
+<p align="center"><sub>0 → 149 stars in under 4 days after the first star, peaking at +28 in a single hour · <a href="https://star-history.com/#Johnson-Durui/ApexCluster&Date">Live chart →</a></sub></p>
+
 ---
 
 ## Online Demo
