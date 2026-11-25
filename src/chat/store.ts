@@ -187,12 +187,12 @@ export class ChatStore {
     this.stateCache.set(chatId, { chat: clone(chat), revision, hash: currentHash });
     return chat;
   }
-  create(input: { title?: string; workspaceId?: string; apiRoster?: ChatRecord['apiRoster']; pipeline?: ChatRecord['pipeline'] } = {}): ChatRecord {
-    const t = now(); const chat: ChatRecord = { version: 1, id: id(), title: input.title?.trim() || '新聊天', createdAt: t, updatedAt: t, ...(input.workspaceId ? { workspaceId: input.workspaceId } : {}), ...(input.apiRoster ? { apiRoster: input.apiRoster } : {}), seq: 0, messageSeq: 0, turns: [], tasks: [], invocations: [], tickets: [], artifacts: [], checkpoints: [], constraintMessageIds: [] };
+  create(input: { title?: string; workspaceId?: string; apiRoster?: ChatRecord['apiRoster']; cliRoster?: ChatRecord['cliRoster']; team?: ChatRecord['team']; pipeline?: ChatRecord['pipeline'] } = {}): ChatRecord {
+    const t = now(); const chat: ChatRecord = { version: 1, id: id(), title: input.title?.trim() || '新聊天', createdAt: t, updatedAt: t, ...(input.workspaceId ? { workspaceId: input.workspaceId } : {}), ...(input.apiRoster ? { apiRoster: input.apiRoster } : {}), ...(input.cliRoster ? { cliRoster: input.cliRoster } : {}), ...(input.team ? { team: input.team } : {}), seq: 0, messageSeq: 0, turns: [], tasks: [], invocations: [], tickets: [], artifacts: [], checkpoints: [], constraintMessageIds: [] };
     if (input.pipeline) chat.pipeline = input.pipeline;
     mkdirSync(this.dir(chat.id), { recursive: true }); this.messagesDir(chat.id); this.eventsDir(chat.id); this.save(chat); this.messageSeq.set(chat.id, 0); return chat;
   }
-  list() { const base = path.join(this.root, 'chats'); if (!existsSync(base)) return []; return readdirSync(base, { withFileTypes: true }).filter(e => e.isDirectory()).flatMap(e => { try { const c = this.load(e.name); return [{ id: c.id, title: c.title, ...(c.workspaceId ? { workspaceId: c.workspaceId } : {}), updatedAt: c.updatedAt, status: c.turns.at(-1)?.status ?? 'completed' }]; } catch { return []; } }).sort((a,b) => b.updatedAt.localeCompare(a.updatedAt)); }
+  list() { const base = path.join(this.root, 'chats'); if (!existsSync(base)) return []; return readdirSync(base, { withFileTypes: true }).filter(e => e.isDirectory()).flatMap(e => { try { const c = this.load(e.name); return [{ id: c.id, title: c.title, ...(c.workspaceId ? { workspaceId: c.workspaceId } : {}), ...(c.team ? { team: c.team } : {}), updatedAt: c.updatedAt, status: c.turns.at(-1)?.status ?? 'completed' }]; } catch { return []; } }).sort((a,b) => b.updatedAt.localeCompare(a.updatedAt)); }
   get(id: string) {
     const chat = this.load(id); const previousSeq = chat.seq; const previousMessageSeq = chat.messageSeq; const previousConstraints = JSON.stringify(chat.constraintMessageIds); const index = this.eventIndex(id); chat.seq = Math.max(chat.seq, index.at(-1)?.last ?? 0);
     if (chat.apiRoster && chat.seq > previousSeq) {

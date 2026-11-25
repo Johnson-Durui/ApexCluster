@@ -6,7 +6,7 @@ import { z } from 'zod/v4';
 import type { CommandSpec, RunnerResult } from './runner.js';
 import type { CommandRunner, RunnerCommandInfo } from './runner-contract.js';
 import type { AgentTask, ChatRecord, Invocation, ToolDefinition, ToolReply } from './types.js';
-import { taskSeat } from './roster.js';
+import { chatRoster, taskSeat } from './roster.js';
 import { WorkspaceFileMissingError, WorkspaceRegistry, type IntegrationResult, type WorkspaceChanges, type WorkspaceSnapshot } from './workspace.js';
 import type { ExecResult, ExecWorkspace } from '../exec/types.js';
 import type {
@@ -335,28 +335,34 @@ export class WorkspaceGateway implements PipelineWorkspaceHost {
     }).commit;
   }
 
+  private hasExplicitRoster(chat: ChatRecord): boolean {
+    return Boolean(chat.apiRoster || chat.cliRoster);
+  }
+
   private canWriteMain(chat: ChatRecord, task: AgentTask): boolean {
-    return chat.apiRoster ? Boolean(taskSeat(chat, task)?.can.writeMain) && task.mode === 'edit' : task.role === 'sol' && task.mode === 'edit';
+    return this.hasExplicitRoster(chat) ? Boolean(taskSeat(chat, task)?.can.writeMain) && task.mode === 'edit' : task.role === 'sol' && task.mode === 'edit';
   }
 
   private canWriteIsolated(chat: ChatRecord, task: AgentTask): boolean {
-    return chat.apiRoster ? Boolean(taskSeat(chat, task)?.can.writeIsolated) && task.mode === 'edit' : task.role === 'grok' && task.mode === 'edit';
+    return this.hasExplicitRoster(chat) ? Boolean(taskSeat(chat, task)?.can.writeIsolated) && task.mode === 'edit' : task.role === 'grok' && task.mode === 'edit';
   }
 
   private canAccept(chat: ChatRecord, task: AgentTask): boolean {
-    return chat.apiRoster ? Boolean(taskSeat(chat, task)?.can.acceptance) && task.mode === 'verify' : task.role === 'astra' && task.mode === 'verify';
+    return this.hasExplicitRoster(chat) ? Boolean(taskSeat(chat, task)?.can.acceptance) && task.mode === 'verify' : task.role === 'astra' && task.mode === 'verify';
   }
 
   private canExecute(chat: ChatRecord, task: AgentTask): boolean {
-    return chat.apiRoster ? Boolean(taskSeat(chat, task)?.can.exec) && task.mode !== 'read' && this.commandInfo().length > 0 : task.role !== 'claude';
+    if (chat.apiRoster) return Boolean(taskSeat(chat, task)?.can.exec) && task.mode !== 'read' && this.commandInfo().length > 0;
+    if (chat.cliRoster) return Boolean(taskSeat(chat, task)?.can.exec) && task.mode !== 'read';
+    return task.role !== 'claude';
   }
 
   private canIntegrate(chat: ChatRecord, task: AgentTask): boolean {
-    return chat.apiRoster ? Boolean(taskSeat(chat, task)?.can.integrate) && this.canWriteMain(chat, task) : task.role === 'sol' && task.mode === 'edit';
+    return this.hasExplicitRoster(chat) ? Boolean(taskSeat(chat, task)?.can.integrate) && this.canWriteMain(chat, task) : task.role === 'sol' && task.mode === 'edit';
   }
 
   private usesFrozenView(chat: ChatRecord, task: AgentTask): boolean {
-    return chat.apiRoster ? task.mode === 'verify' || taskSeat(chat, task)?.kind === 'worker' : task.role === 'astra' || task.role === 'grok';
+    return this.hasExplicitRoster(chat) ? task.mode === 'verify' || taskSeat(chat, task)?.kind === 'worker' : task.role === 'astra' || task.role === 'grok';
   }
 
   commandInfo(): RunnerCommandInfo[] { return this.runner?.commandInfo?.() ?? []; }
@@ -528,7 +534,7 @@ export class WorkspaceGateway implements PipelineWorkspaceHost {
       if (identity.chat.apiRoster && (!this.canExecute(identity.chat, task) || !['edit', 'verify'].includes(task.mode) || this.commandInfo().length === 0)) {
         throw new Error('当前 API 席位、任务模式或受控命令证明不允许运行测试。');
       }
-      if (!identity.chat.apiRoster && !this.canExecute(identity.chat, task)) throw new Error('Claude 统筹角色不直接运行测试。');
+      if (!identity.chat.apiRoster && !this.canExecute(identity.chat, task)) throw new Error(identity.chat.cliRoster ? '当前席位或任务模式没有测试执行权限。' : 'Claude 统筹角色不直接运行测试。');
       const input = testInput.parse(raw);
       if (path.isAbsolute(input.cwd) || input.cwd.split(/[\\/]+/).some((part) => part === '..' || part.includes(':'))) throw new Error('测试工作目录必须是测试副本内的相对路径。');
       this.state(identity);
@@ -538,7 +544,7 @@ export class WorkspaceGateway implements PipelineWorkspaceHost {
       return reply;
     }
     if (name === 'integrate_edit') {
-      if (!this.canIntegrate(identity.chat, task)) throw new Error(identity.chat.apiRoster ? '当前席位没有集成独立编辑的权限。' : '只有 Sol 编辑任务可以集成 Grok 修改。');
+      if (!this.canIntegrate(identity.chat, task)) throw new Error(this.hasExplicitRoster(identity.chat) ? '当前席位没有集成独立编辑的权限。' : '只有 Sol 编辑任务可以集成 Grok 修改。');
       const input = z.object({ taskId: z.string(), allowedFiles: z.array(pathInput).min(1).max(200) }).strict().parse(raw);
       if (identity.chat.pipeline && task.phase === 'demo' && input.allowedFiles.some(file => !file.replaceAll('\\', '/').startsWith('demo/'))) {
         throw new Error('Demo 只能集成到 demo/ 目录');
@@ -631,15 +637,20 @@ export class WorkspaceGateway implements PipelineWorkspaceHost {
   }
 
   completionIssues(chat: ChatRecord, task: AgentTask): string[] {
-    if (task.parentTaskId || task.role !== (chat.apiRoster?.roster.rootSeat ?? 'claude')) return [];
+    if (task.parentTaskId || task.role !== chatRoster(chat).rootSeat) return [];
     const requiredRevision = this.currentSourceRevision(chat, task.turnId);
     if (!requiredRevision) return [];
+    if (chat.team && !chat.team.requireAcceptanceReview) return [];
     const candidates = chat.tasks
       .filter((candidate) => candidate.turnId === task.turnId && this.canAccept(chat, candidate))
       .map((candidate) => ({ task: candidate, state: this.taskStates.get(candidate.id) }))
       .filter((candidate): candidate is { task: AgentTask; state: TaskWorkspaceState } => Boolean(candidate.state))
       .filter((candidate) => candidate.state.sourceRevisionAtFreeze >= requiredRevision && candidate.state.baseline);
-    if (!candidates.length) return ['本轮源码已由 Sol 修改，但尚无 Astra 针对最新集成后源码创建的冻结验证快照。'];
+    if (!candidates.length) {
+      return [chat.team
+        ? `本轮源码已修改，但尚无${this.acceptanceLabel(chat)}针对最新源码创建的冻结验证快照。`
+        : '本轮源码已由 Sol 修改，但尚无 Astra 针对最新集成后源码创建的冻结验证快照。'];
+    }
     const evaluated = candidates.map((candidate) => this.astraCompletionIssues(chat, candidate.task, candidate.state));
     return evaluated.find((issues) => issues.length === 0) ?? evaluated.sort((left, right) => left.length - right.length)[0]!;
   }
@@ -743,7 +754,11 @@ export class WorkspaceGateway implements PipelineWorkspaceHost {
         };
         this.taskStates.set(parent.id, parentState);
       }
-      if (!parentState.baseline) throw new Error('父 Astra 验收任务没有可继承的冻结基线。');
+      if (!parentState.baseline) {
+        throw new Error(identity.chat.team
+          ? `父${this.acceptanceLabel(identity.chat, parent)}任务没有可继承的冻结基线。`
+          : '父 Astra 验收任务没有可继承的冻结基线。');
+      }
       inheritedBaseline = this.registry.cloneReadOnlySnapshot(parentState.baseline, identity.task.id);
       inheritedRevision = parentState.sourceRevisionAtFreeze;
     }
@@ -853,31 +868,40 @@ export class WorkspaceGateway implements PipelineWorkspaceHost {
     return chat.sourceRevisions?.[turnId] ?? 0;
   }
 
+  private acceptanceLabel(chat: ChatRecord, task?: AgentTask): string {
+    if (!chat.team) return 'Astra';
+    if (task) return `独立验收席位（${task.role}）`;
+    const reviewers = chat.team.members.filter((member) => member.role === 'reviewer').map((member) => member.seatId);
+    return reviewers.length ? `独立验收席位（${reviewers.join(' / ')}）` : '独立验收席位';
+  }
+
   private astraCompletionIssues(chat: ChatRecord, task: AgentTask, state: TaskWorkspaceState): string[] {
     const issues: string[] = [];
-    if (task.status !== 'completed') issues.push(`Astra 验证任务未完成：${task.status}。`);
+    const label = this.acceptanceLabel(chat, task);
+    const sep = chat.team ? '' : ' ';
+    if (task.status !== 'completed') issues.push(`${label}${sep}验证任务未完成：${task.status}。`);
     const invocations = task.invocationIds.map((id) => chat.invocations.find((candidate) => candidate.id === id));
     if (!invocations.length || invocations.some((invocation) => !invocation || invocation.status !== 'exited' || invocation.exitConfirmed !== true)) {
-      issues.push('Astra 验证仍有调用段未确认安全退出。');
+      issues.push(`${label}${sep}验证仍有调用段未确认安全退出。`);
     }
-    if (!state.exitConfirmed) issues.push('Astra 最新验证调用段的退出状态尚未确认。');
+    if (!state.exitConfirmed) issues.push(`${label}${sep}最新验证调用段的退出状态尚未确认。`);
     const tests = state.baseline ? state.tests.filter((evidence) => evidence.sourceSnapshotId === state.baseline!.id) : [];
-    if (!tests.length) issues.push('Astra 尚未在最新冻结源码快照上运行真实测试。');
+    if (!tests.length) issues.push(`${label}${sep}尚未在最新冻结源码快照上运行真实测试。`);
     const failed = tests.filter((evidence) => !evidence.ok);
     if (failed.length) {
       const detail = failed.map((evidence) => {
         if ('error' in evidence.result) return evidence.result.error;
         return `exit=${evidence.result.exitCode}${evidence.result.timedOut ? ', timedOut' : ''}${evidence.result.cancelled ? ', cancelled' : ''}${evidence.result.stderrTail ? `, stderr=${evidence.result.stderrTail.slice(-300)}` : ''}`;
       }).join('；');
-      issues.push(`Astra 真实测试未通过：${detail}`);
+      issues.push(`${label}${sep}真实测试未通过：${detail}`);
     }
     if (state.baseline) {
       try {
         const drift = this.registry.workspaceChanges(state.baseline);
         const paths = [...drift.modified, ...drift.created, ...drift.deleted];
-        if (paths.length) issues.push(`Astra 验证后原项目哈希已漂移：${paths.join(', ')}。`);
+        if (paths.length) issues.push(`${label}${sep}验证后原项目哈希已漂移：${paths.join(', ')}。`);
       } catch (error) {
-        issues.push(`无法复核 Astra 验证后的原项目哈希：${error instanceof Error ? error.message : String(error)}`);
+        issues.push(`无法复核${sep}${label}${sep}验证后的原项目哈希：${error instanceof Error ? error.message : String(error)}`);
       }
     }
     return issues;

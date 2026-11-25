@@ -62,9 +62,11 @@ function ChatSession({ route, handoff }: { route: Route; handoff: { current: str
   const startDemo = useRef<() => Promise<void>>(async () => undefined);
   const fresh = route.fresh;
   const chat = fresh ? null : state.chat?.id === route.chatId ? state.chat : null;
+  const defaultPreset = grants.globalCapabilities?.apiConfiguration?.presets.find(item => item.available)?.id
+    ?? grants.globalCapabilities?.apiConfiguration?.presets.find(item => item.architectureAvailable)?.id;
   const send = useChatSend({
     chat, messages: state.messages, fresh, ready: !loading && (fresh || Boolean(chat)), dispatch, workspace: grants.selected, setWorkspace: grants.setSelected,
-    workspaceBusy: grants.busy, demoParam: route.demoParam, defaultPreset: grants.globalCapabilities?.apiConfiguration?.presets.find(item => item.available)?.id,
+    workspaceBusy: grants.busy, demoParam: route.demoParam, defaultPreset, teamConfiguration: grants.globalCapabilities?.teamConfiguration,
     handoff, startDemo: () => startDemo.current(),
   });
   errorSink.current = send.setError;
@@ -172,10 +174,13 @@ function ChatSession({ route, handoff }: { route: Route; handoff: { current: str
           pending={send.pending} maxFiles={MAX_ATTACHMENT_BATCH} onFiles={send.addFiles} onRetryUpload={item => void send.retryUpload(item)} onRemoveUpload={item => void send.removeUpload(item)}
           error={send.error} costConfirmed={send.costConfirmed} onCostConfirm={send.confirmCost} onCostRevoke={send.revokeCost} steeringAck={send.steeringAck}
           pipeline={{ mode: send.mode, workspace: Boolean(grants.selected), preset: Boolean(send.preset) }}
+          team={{ custom: send.teamDraft.mode === 'custom', invalid: !send.teamValidation.valid, reason: send.teamValidation.error }}
           runMode={!chat && !demoInput && !loadError && !loading ? <PipelineComposerControls configuration={grants.globalCapabilities?.apiConfiguration} mode={send.mode} preset={send.preset} auto={send.auto} disabled={send.sending || grants.busy} workspaceGranted={Boolean(grants.selected)} onMode={send.setMode} onPreset={send.setPreset} onAuto={send.setAuto} /> : null}
           project={<ProjectControl chat={chat} unavailable={!fresh && !chat ? (loadError ? 'failed' : 'loading') : false} workspaces={grants.workspaces} selected={grants.selected} busy={grants.busy} sending={send.sending}
             nativePicker={grants.globalCapabilities?.nativePicker} onSelect={grants.setSelected} onChoose={grants.choose} onRevoke={id => void grants.revoke(id)} />}
-          collab={<CollabPopover capabilities={capabilities} model={model} demo={fixedDemo} />} />} />}
+          collab={<CollabPopover capabilities={capabilities} model={model} demo={fixedDemo} chat={chat} runMode={send.mode} preset={send.preset}
+            teamConfiguration={grants.globalCapabilities?.teamConfiguration} teamDraft={send.teamDraft} onTeamDraft={send.setTeamDraft}
+            teamValidation={send.teamValidation} disabled={send.sending || grants.busy || Boolean(loadError || loading)} />} />} />}
       map={context => <ChatMap model={model} chat={chat} variant={context.variant} demo={fixedDemo} animateChanges={live} canFlow={fixedDemo ? !demo.playback?.paused : state.connection === 'live'}
         welcome={welcome && !chat ? { ready: capabilities.filter(item => item.available).length, unavailable: capabilities.filter(item => !item.available).map(item => ({ role: seatLabel(item.role), reason: item.reason ?? '当前不可用' })), previewPipeline } : undefined}
         rail={mapRail(context.onGateNode)} dock={context.dock} dockOpen={context.dockOpen} onDockFit={context.onDockFit} onToggleMax={context.onToggleMax} onCollapse={context.onCollapse} onGateNode={context.onGateNode} />}

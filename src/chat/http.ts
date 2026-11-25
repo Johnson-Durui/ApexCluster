@@ -6,6 +6,7 @@ import { HttpError } from '../orchestrator/errors.js';
 import { safePlanFeedback } from './plans.js';
 import { SECURITY_HEADERS, allowedHosts } from '../server/security.js';
 import type { ChatRuntime } from './runtime.js';
+import { chatTeamInputSchema } from './team.js';
 import type { WorkspaceGrant, WorkspaceRegistry } from './workspace.js';
 
 interface Selection { requestId: string; status: 'pending' | 'selected' | 'cancelled'; expiresAt: number; workspace?: WorkspaceGrant }
@@ -77,6 +78,7 @@ export function createChatHttp(options: ChatHttpOptions) {
       const [services, exec] = await Promise.all([options.runtime?.serviceCapabilities(), options.runtime?.execCapabilities()]);
       send(res, 200, { drivers: options.runtime?.capabilities() ?? [], services: services ?? [], exec,
         apiConfiguration: options.runtime?.apiConfiguration?.(exec),
+        teamConfiguration: options.runtime?.teamConfiguration?.(),
         runner: options.runner ?? { available: false, reason: '测试runner尚未验证' }, nativePicker: options.picker?.available ?? false,
         dataRoot: options.dataRoot, unavailableReason: options.unavailableReason });
       return true;
@@ -93,7 +95,7 @@ export function createChatHttp(options: ChatHttpOptions) {
     if (workspace && method === 'DELETE') { z.object({}).strict().parse(await body(req)); registry().revoke(workspace[1]!); options.runtime?.revokeWorkspace(workspace[1]!); send(res, 200, { revoked: true }); return true; }
     if (pathname === '/api/chats') {
       if (method === 'GET') { send(res, 200, runtime().list()); return true; }
-      if (method === 'POST') { const input = z.object({ title: z.string().trim().min(1).max(200).optional(), workspaceId: z.string().max(100).optional(), pipeline: pipelineCreateSchema.optional() }).strict().parse(await body(req)); send(res, 201, runtime().create(input)); return true; }
+      if (method === 'POST') { const input = z.object({ title: z.string().trim().min(1).max(200).optional(), workspaceId: z.string().max(100).optional(), pipeline: pipelineCreateSchema.optional(), team: chatTeamInputSchema.optional() }).strict().parse(await body(req)); send(res, 201, runtime().create(input)); return true; }
     }
     const pipelineGate = new RegExp(`^/api/chats/(${idPattern})/gates/(A|B)$`).exec(pathname);
     if (pipelineGate) {
@@ -104,7 +106,7 @@ export function createChatHttp(options: ChatHttpOptions) {
     const chat = new RegExp(`^/api/chats/(${idPattern})(?:/(messages|answers|cancel|events|artifacts|attachments|trace)(?:/(${idPattern}))?)?$`).exec(pathname);
     if (!chat) return false;
     const rt = runtime(); const id = chat[1]!; const action = chat[2]; rt.get(id);
-    if (!action && method === 'GET') { const page = rt.store.messages(id); const record = rt.get(id); send(res, 200, { chat: record, messages: page.items, nextBefore: page.nextBefore, capabilities: rt.capabilities(), streams: rt.streams(id), recentEvents: rt.store.events(id, Math.max(0, record.seq - 500), 500).items }); return true; }
+    if (!action && method === 'GET') { const page = rt.store.messages(id); const record = rt.get(id); send(res, 200, { chat: record, messages: page.items, nextBefore: page.nextBefore, capabilities: rt.chatCapabilities(id), streams: rt.streams(id), recentEvents: rt.store.events(id, Math.max(0, record.seq - 500), 500).items }); return true; }
     if (action === 'messages' && method === 'GET') { send(res, 200, rt.store.messages(id, { before: url.searchParams.has('before') ? number(url.searchParams.get('before'), 0) : undefined, limit: number(url.searchParams.get('limit'), 50, 50) })); return true; }
     if (action === 'messages' && method === 'POST') { const input = z.object({ text: z.string().min(1).max(100_000), clientMessageId: z.string().min(1).max(100), confirmCost: z.boolean().optional(), attachmentIds: z.array(z.string()).max(10).optional() }).strict().parse(await body(req)); send(res, 202, rt.send(id, input)); return true; }
     if (action === 'answers' && method === 'POST') { send(res, 202, rt.answer(id, z.object({ ticketId: z.string(), text: z.string().min(1).max(100_000), clientMessageId: z.string().min(1).max(100) }).strict().parse(await body(req)))); return true; }

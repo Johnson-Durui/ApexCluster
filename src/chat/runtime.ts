@@ -13,7 +13,8 @@ import { professionalProfiles, profileAllows } from './profiles.js';
 import type { ProjectExport, ProjectOutputStore } from '../artifacts/project-output.js';
 import { executionRoot, hasFullPageChain, isExecutionReviewTask, latchExecutionReview, reviewerCanReadTask, reviewReadinessIssues, materializeExecutionView, executionCompletionIssues, submitExecutionReview } from './execution.js';
 import { CHAT_LIMITS, terminalTask, type AgentTask, type ChatDriver, type ChatEvent, type ChatMessage, type ChatRecord, type ChatRole, type DriverInput, type Invocation, type ProgramDiffArtifact, type ResultReadPage, type RunnerEvidenceMetadata, type ToolDefinition, type ToolReceiptDelivery, type ToolReply, type WaitTicket } from './types.js';
-import { allowedDelegateSeats, canDelegateByWeight, CLI_ROSTER, freezeApiRoster, phaseSchema, resolvePool, resolveSeat, seatIdSchema, taskSeat, type ApiChatBinding, type PhaseId, type ResolvedSeat, type Roster } from './roster.js';
+import { allowedDelegateSeats, canDelegateByWeight, chatRoster, CLI_ROSTER, freezeApiRoster, phaseSchema, resolvePool, resolveSeat, seatIdSchema, taskSeat, type ApiChatBinding, type PhaseId, type ResolvedSeat, type Roster } from './roster.js';
+import { buildApiTeamConfiguration, buildCliTeamConfiguration, synthesizeApiTeamRoster, synthesizeCliTeamRoster, type ChatTeamConfiguration } from './team.js';
 import { contextPolicy } from './window.js';
 import { buildHandoff, immutableBlob } from './handoff.js';
 import { apiBudgetPatch, estimateUsageUsd, parseApiRunSettings, reserveUsageUsd, type ApiRunSettings } from './api-run-settings.js';
@@ -173,9 +174,28 @@ export class ChatRuntime {
     if (!api) return Object.values(this.options.drivers).map(driver => driver.capability);
     return api.roster.seats.map(seat => api.resolveDriver(resolveSeat(api.roster, seat.id)!).capability);
   }
+  chatCapabilities(id: string) {
+    const chat = this.get(id);
+    const api = this.options.api;
+    if (chat.apiRoster && api) {
+      return chat.apiRoster.roster.seats.map(seat =>
+        this.driverFor(chat, seat.id)?.capability ?? api.resolveDriver(resolveSeat(chat.apiRoster!.roster, seat.id)!).capability,
+      );
+    }
+    if (chat.cliRoster) {
+      return chat.cliRoster.seats.map(seat => this.options.drivers[seat.id]?.capability ?? {
+        role: seat.id, available: false, reason: '本地 CLI 驱动未配置', isolationVerified: false,
+        model: seat.bindings.default.model, effort: seat.bindings.default.effort,
+      });
+    }
+    return this.capabilities();
+  }
+  teamConfiguration(): ChatTeamConfiguration {
+    return this.options.api ? buildApiTeamConfiguration(this.options.api) : buildCliTeamConfiguration(this.options.drivers);
+  }
   serviceCapabilities() { return this.options.capabilities?.status() ?? Promise.resolve([]); }
   /** Expose only public model metadata and environment variable presence. */
-  apiConfiguration(exec?: { backend: string | null; available: boolean; reason?: string }) {
+  apiConfiguration(exec?: { backend: string | null; available: boolean; reason?: string; unsafe?: boolean }) {
     const api = this.options.api;
     if (!api) return { mode: 'cli' as const, keyReadiness: [], modelChecks: [], presets: [] };
     const models = [...api.registry.values()];
@@ -191,11 +211,15 @@ export class ChatRuntime {
         const binding = resolveSeat(roster, role, 'implementation')?.binding;
         return binding && api.registry.get(binding.model)?.family;
       });
+      const crossFamily = !families.includes(undefined) && new Set(families).size === 2;
+      const scope: 'full' | 'architecture_only' = crossFamily ? 'full' : 'architecture_only';
       const unavailable = seats.find(seat => !seat.available);
+      const isolatedExecReady = !exec || (exec.available && !exec.unsafe);
+      const architectureAvailable = !unavailable && isolatedExecReady;
       const reason = unavailable ? `${unavailable.role}：${unavailable.reason ?? '型号不可用'}`
-        : families.includes(undefined) || new Set(families).size !== 2 ? '完整流水线需要 Sol 与 Opus 来自不同厂商家族'
+        : !crossFamily ? '完整流水线需要 Sol 与 Opus 来自不同厂商家族'
           : exec && (!exec.available || exec.backend !== 'docker') ? exec.reason ?? '完整流水线需要 Docker 沙箱' : undefined;
-      return { id, rootSeat: roster.rootSeat, seats, available: !reason, ...(reason ? { reason } : {}) };
+      return { id, rootSeat: roster.rootSeat, seats, available: !reason, scope, architectureAvailable, ...(reason ? { reason } : {}) };
     });
     return { mode: 'api' as const, keyReadiness: [...keys.values()], modelChecks: models.map(model => ({
       id: model.id, provider: model.provider, status: api.modelCheckStatus?.(model) ?? 'unchecked',
@@ -227,20 +251,36 @@ export class ChatRuntime {
     if (!chat) { try { chat = this.store.get(id); } catch { throw new HttpError(404, '聊天不存在或记录损坏'); } this.chats.set(id, chat); }
     return chat;
   }
-  create(input: { title?: string; workspaceId?: string; pipeline?: unknown }): ChatRecord {
+  create(input: { title?: string; workspaceId?: string; pipeline?: unknown; team?: unknown }): ChatRecord {
     if (this.stopping) throw new HttpError(503, '工作台正在关闭');
     if (input.workspaceId) this.options.workspace?.assertWorkspace(input.workspaceId);
     if (input.workspaceId && !this.options.workspace) throw new HttpError(409, '本地文件能力不可用');
+    if (input.team !== undefined && input.pipeline !== undefined) {
+      throw new HttpError(400, '自定义多 Agent 团队配置暂不支持与固定流水线同时启用，请使用普通聊天模式');
+    }
     const api = this.options.api;
     const pipeline = input.pipeline === undefined ? undefined : newPipelineState(input.pipeline, this.options.pipelineSettings);
     if (pipeline && (!api || !input.workspaceId)) throw new HttpError(409, '流水线需要 API 驱动和已授权的项目目录');
-    const roster = pipeline
+    let roster = pipeline
       ? (this.options.pipelineRosters?.get(pipeline.preset) ?? (pipeline.preset === 'flagship' ? api?.roster : undefined))
       : api?.roster;
     if (pipeline && !roster) throw new HttpError(400, '没有对应的流水线名册预设');
+    let cliRoster: Roster | undefined;
+    let team: ChatRecord['team'];
+    if (input.team !== undefined) {
+      if (api) {
+        const synthesized = synthesizeApiTeamRoster(input.team, api);
+        roster = synthesized.roster;
+        team = synthesized.team;
+      } else {
+        const synthesized = synthesizeCliTeamRoster(input.team, this.options.drivers);
+        cliRoster = synthesized.roster;
+        team = synthesized.team;
+      }
+    }
     const { title, workspaceId } = input;
     const chat = this.store.create({ title, workspaceId, ...(api && roster ? { apiRoster: freezeApiRoster(roster, api.registry, api.context) } : {}),
-      ...(pipeline ? { pipeline } : {}) });
+      ...(cliRoster ? { cliRoster } : {}), ...(team ? { team } : {}), ...(pipeline ? { pipeline } : {}) });
     this.chats.set(chat.id, chat);
     return chat;
   }
@@ -272,7 +312,7 @@ export class ChatRuntime {
     return chat.apiRoster ? contextPolicy(chat.apiRoster.context, task.role, taskSeat(chat, task)?.kind === 'worker') : undefined;
   }
   private rootRole(chat: ChatRecord): ChatRole {
-    return (chat.apiRoster?.roster ?? CLI_ROSTER).rootSeat;
+    return chatRoster(chat).rootSeat;
   }
   private delegatedPhases(task: AgentTask): PhaseId[] {
     const phase = task.phase ?? 'architecture';
@@ -421,7 +461,9 @@ export class ChatRuntime {
     if (!root) {
       // The user message is a write-ahead intent. No model can start before a task snapshot exists.
       for (let since = 0;;) { const page = this.store.events(chat.id, since); if (page.items.some(event => event.turnId === message.turnId && ['invocation_started','tool_started'].includes(event.type))) throw new HttpError(409, '已存在执行记录但任务状态缺失，禁止重放'); if (!page.hasMore) break; since = page.next; }
-      root = this.newTask(chat, this.rootRole(chat), message.text, message.turnId);
+      const rootSeat = resolveSeat(chatRoster(chat), this.rootRole(chat), chat.apiRoster ? 'architecture' : undefined);
+      const rootMode: AgentTask['mode'] = chat.workspaceId && rootSeat?.can.writeMain ? 'edit' : 'read';
+      root = this.newTask(chat, this.rootRole(chat), message.text, message.turnId, undefined, rootMode);
       chat.turns.push({ id: message.turnId, rootTaskId: root.id, status: 'queued', createdAt: message.createdAt });
       if (chat.pipeline && !chat.pipeline.architectureTaskId && chat.pipeline.stage === 'architecture') {
         chat.pipeline.architectureTaskId = root.id;
@@ -1562,14 +1604,47 @@ export class ChatRuntime {
     const seat = taskSeat(chat, task);
     if (!seat) throw new Error('聊天任务的席位未注册');
     const roster = chat.apiRoster?.roster;
+    const cliRoster = chat.cliRoster;
     const api = Boolean(roster);
+    const activeRoster = roster ?? cliRoster;
     const can = seat.can;
     const worker = seat.kind === 'worker';
     const work = task.pipelineWork?.kind;
-    const delegates = roster ? allowedDelegateSeats(roster, seat) : [];
+    const rawDelegates = activeRoster ? allowedDelegateSeats(activeRoster, seat) : [];
     const phases = this.delegatedPhases(task).filter(phase => chat.pipeline?.stage !== 'architecture' || phase !== 'cluster');
+    let rootAvailCache: boolean | undefined;
+    const isRootAvailable = () => (rootAvailCache ??= Boolean(this.driverFor(chat, this.rootRole(chat), api ? 'architecture' : undefined)?.capability.available));
+    const seatAvailable = (role: string) => api
+      ? phases.some(phase => Boolean(this.driverFor(chat, role, phase)?.capability.available))
+      : Boolean(this.driverFor(chat, role)?.capability.available);
+    const delegates = rawDelegates.length && !chat.team && !chat.pipeline && isRootAvailable()
+      ? rawDelegates.filter(seatAvailable)
+      : rawDelegates;
+    const customReviewDesc = '仅指定的独立验收席位提交当前契约的逐步骤评审。先完整读取execution_read的viewRef与证据，发布自己kind:report的真实报告。outcome为passed/failed/insufficient，stepVerdicts精确覆盖全部工作步骤；评审在工作计划之外。';
     const taskTools = definitions.flatMap(tool => {
-      if (!api) return worker && ['agent_submit', 'grok_submit', 'grok_collect', 'grok_disposition'].includes(tool.name) ? [] : [tool];
+      if (!api) {
+        if (worker && ['agent_submit', 'grok_submit', 'grok_collect', 'grok_disposition'].includes(tool.name)) return [];
+        if (cliRoster) {
+          if (tool.name === 'agent_submit') {
+            return delegates.length && seat.binding.delegation !== 'none' ? [{
+              name: tool.name,
+              description: '委派当前团队允许的协作者，说明目标、范围、权限模式和验收证据。',
+              inputSchema: objectSchema({ role: { type: 'string', enum: delegates }, goal: str,
+                mode: { type: 'string', enum: ['read', 'edit', 'verify'] },
+                profileId: { type: 'string', enum: Object.keys(professionalProfiles) },
+                purpose: { type: 'string', enum: ['execution_review'] } }, ['role', 'goal']),
+            }] : [];
+          }
+          if (tool.name === 'grok_submit') {
+            return delegates.includes('grok') && seat.binding.delegation !== 'none' ? [tool] : [];
+          }
+          if ((tool.name === 'grok_collect' || tool.name === 'grok_disposition') && seat.binding.delegation === 'none' && !delegates.length) {
+            return [];
+          }
+          if (chat.team && tool.name === 'execution_submit_review') return [{ ...tool, description: customReviewDesc }];
+        }
+        return [tool];
+      }
       if (tool.name === 'grok_submit') return [];
       if (tool.name === 'agent_submit') return delegates.length && phases.length && (!work || work === 'implementation-lead') ? [{
         name: tool.name,
@@ -1593,6 +1668,7 @@ export class ChatRuntime {
         done: { type: 'array', items: str }, unverified: { type: 'array', items: str }, risks: { type: 'array', items: str },
       }, ['next']) }];
       if (tool.name === 'artifact_publish' && (seat.kind === 'ideator' || worker)) return [];
+      if (chat.team && tool.name === 'execution_submit_review') return [{ ...tool, description: customReviewDesc }];
       return [tool];
     });
     if (api) taskTools.push({ name: 'notes_write', description: '整份更新当前任务的模型笔记。每次写入保留版本，笔记不会修改程序事实。',
@@ -1612,7 +1688,13 @@ export class ChatRuntime {
     if (work === 'plan-review' || work === 'milestone-review') taskTools.push({ name: 'review_submit',
       description: '对当前冻结哈希登记独立评审和编号缺陷。', inputSchema: pipelineReviewInput });
     if (api && !worker && seat.binding.delegation !== 'none') {
-      const pools = this.availablePools(chat, task);
+      const allPools = this.availablePools(chat, task);
+      let pools = allPools;
+      if (allPools.length && !chat.team && !chat.pipeline && isRootAvailable()) {
+        const poolProvider = this.options.api?.registry.get(seat.binding.model)?.provider;
+        const poolPhase = task.phase ?? 'architecture';
+        pools = allPools.filter(poolId => Boolean(this.driverFor(chat, poolId, poolPhase, poolProvider)?.capability.available));
+      }
       if (pools.length) {
         const mode = { type: 'string', enum: ['read', 'edit', 'verify'] };
         const pool = { type: 'string', enum: pools };
@@ -1626,7 +1708,15 @@ export class ChatRuntime {
     }
     const workspaceTools = (this.options.workspace?.definitions ?? []).filter(tool => {
       if (!task.workspaceId) return false;
-      if (!api) return !['file_write', 'integrate_edit'].includes(tool.name) || can.writeMain || (can.writeIsolated && task.mode === 'edit');
+      if (!api) {
+        if (cliRoster) {
+          if (tool.name === 'file_write') return task.mode === 'edit' && (can.writeMain || can.writeIsolated);
+          if (tool.name === 'integrate_edit') return task.mode === 'edit' && can.integrate;
+          if (tool.name === 'test_submit') return can.exec && task.mode !== 'read';
+          return true;
+        }
+        return !['file_write', 'integrate_edit'].includes(tool.name) || can.writeMain || (can.writeIsolated && task.mode === 'edit');
+      }
       if (tool.name === 'test_submit') return !this.options.executor && can.exec && task.mode !== 'read' && Boolean(this.options.workspace?.commandInfo?.().length);
       if (tool.name === 'file_write') return task.mode === 'edit' && (can.writeMain || can.writeIsolated);
       if (tool.name === 'integrate_edit') return task.mode === 'edit' && can.integrate;
@@ -2119,7 +2209,7 @@ export class ChatRuntime {
         next: storedCheckpoint.next.slice(0, 500), nextTruncated: storedCheckpoint.next.length > 500,
         note: storedCheckpoint.note?.slice(0, 500), noteTruncated: (storedCheckpoint.note?.length ?? 0) > 500 } : null;
       const commandItems = (this.options.workspace?.commandInfo?.() ?? []).map(command => ({ ...command, executablePaths: command.executablePaths.slice(0, 4).map(value => value.slice(0, 240)), executablePathCount: command.executablePaths.length, truncated: command.executablePaths.length > 4 || command.executablePaths.some(value => value.length > 240) }));
-      const capabilities = this.capabilities().map(capability => ({ role: capability.role, available: capability.available, isolationVerified: capability.isolationVerified, version: capability.version, contextWindow: capability.contextWindow,
+      const capabilities = this.chatCapabilities(chat.id).map(capability => ({ role: capability.role, available: capability.available, isolationVerified: capability.isolationVerified, version: capability.version, contextWindow: capability.contextWindow,
         reason: capability.reason?.slice(0, 160), reasonTruncated: (capability.reason?.length ?? 0) > 160 }));
       const currentBaseline = this.resultReadBaseline(chat, task); const allProvidedPages = task.resultReadPages ?? []; const providedPageItems = allProvidedPages.slice(-8).map(compactResultPage);
       const allRunnerEvidence = allProvidedPages.filter(page => page.runnerEvidence); const runnerEvidenceItems = allRunnerEvidence.slice(-8).map(page => compactRunnerEvidence(page, currentBaseline.authority));
@@ -2213,9 +2303,10 @@ export class ChatRuntime {
     }
     if (name === 'agent_submit' || name === 'grok_submit') {
       const apiRoster = chat.apiRoster?.roster;
+      const activeRoster = apiRoster ?? chat.cliRoster;
       const parentSeat = taskSeat(chat, task)!;
-      const delegates = apiRoster ? allowedDelegateSeats(apiRoster, parentSeat) : parentSeat.can.delegateSeats;
-      const delegateSchema = z.object({ role: apiRoster ? seatIdSchema : roleZ.exclude(['claude', 'grok']), goal: textZ, mode: modeZ.default('read'),
+      const delegates = activeRoster ? allowedDelegateSeats(activeRoster, parentSeat) : parentSeat.can.delegateSeats;
+      const delegateSchema = z.object({ role: activeRoster ? seatIdSchema : roleZ.exclude(['claude', 'grok']), goal: textZ, mode: modeZ.default('read'),
         profileId: z.enum(['general','document','spreadsheet','presentation','research','image']).optional(), purpose: z.literal('execution_review').optional() }).strict();
       const items: Array<z.infer<typeof delegateSchema> & { phase?: PhaseId }> = name === 'agent_submit'
         ? [(apiRoster ? delegateSchema.extend({ phase: phaseSchema.optional() }) : delegateSchema).parse(raw)]
@@ -2223,6 +2314,9 @@ export class ChatRuntime {
       if (chat.pipeline && items[0]?.purpose === 'execution_review') items[0].phase ??= 'acceptance';
       if (work && name === 'agent_submit' && (work !== 'implementation-lead' || items[0]?.purpose !== 'execution_review')) {
         throw new HttpError(403, '实现席位与里程碑由程序编排，主导席可委派 Astra 成品验收');
+      }
+      if (name === 'grok_submit' && chat.cliRoster && (!delegates.includes('grok') || parentSeat.binding.delegation === 'none')) {
+        throw new HttpError(403, '该席位不在当前任务允许的委派目标中');
       }
       if (apiRoster) this.assertApiDispatch(chat, task, items, null);
       else {
@@ -2232,13 +2326,13 @@ export class ChatRuntime {
       for (const item of items) {
         const phase = apiRoster ? item.phase ?? task.phase ?? 'architecture' : undefined;
         if (phase && !this.delegatedPhases(task).includes(phase)) throw new HttpError(403, '委派阶段超出当前任务允许的范围');
-        const target = resolveSeat(apiRoster ?? CLI_ROSTER, item.role, phase);
+        const target = resolveSeat(activeRoster ?? CLI_ROSTER, item.role, phase);
         if (!target || (name === 'agent_submit' && !delegates.includes(item.role))) throw new HttpError(403, '该席位不在当前任务允许的委派目标中');
         const driver = this.driverFor(chat, item.role, phase);
         if (!driver?.capability.available) throw new HttpError(503, driver?.capability.reason ?? `${item.role} 尚未验证`);
-        const canDelegateEdit = apiRoster ? (task.mode === 'edit' || (!task.parentTaskId && task.role === this.rootRole(chat))) : !parentSeat.can.acceptance;
+        const canDelegateEdit = activeRoster ? (task.mode === 'edit' || (!task.parentTaskId && task.role === this.rootRole(chat))) : !parentSeat.can.acceptance;
         if (item.mode === 'edit' && (!task.workspaceId || !canDelegateEdit || task.mode === 'verify' ||
-          (apiRoster && !target.can.writeMain && !target.can.writeIsolated))) throw new HttpError(403, '当前任务仅可读取或验收');
+          (activeRoster && !target.can.writeMain && !target.can.writeIsolated))) throw new HttpError(403, '当前任务仅可读取或验收');
         if (chat.pipeline?.stage === 'architecture' && name === 'agent_submit') {
           if (phase === 'cluster' || (phase === 'demo' && (item.role !== 'sol' || item.mode !== 'edit')) ||
             (phase === 'acceptance' && (item.role !== 'astra' || item.mode !== 'verify' || item.purpose !== 'execution_review')) ||
@@ -2259,11 +2353,11 @@ export class ChatRuntime {
       let view: ReturnType<typeof materializeExecutionView> | undefined;
       if (review) {
         const reviewer = items[0]!;
-        const reviewerSeat = resolveSeat(apiRoster ?? CLI_ROSTER, reviewer.role, reviewer.phase ?? task.phase);
+        const reviewerSeat = resolveSeat(activeRoster ?? CLI_ROSTER, reviewer.role, reviewer.phase ?? task.phase);
         if (work === 'implementation-lead' && (chat.pipeline?.stage !== 'acceptance' || reviewer.role !== 'astra')) {
           throw new HttpError(409, '实现层交回后须由 Astra 对成品独立验收');
         }
-        if (task.parentTaskId || task.role !== this.rootRole(chat) || task.executionPolicyVersion !== 1 || !reviewerSeat?.can.acceptance || reviewer.mode !== 'verify') throw new HttpError(403, apiRoster ? '独立执行评审只能由新契约根任务委派具备验收权限的验证席位' : '独立执行评审只能由新契约根任务委派Astra verify');
+        if (task.parentTaskId || task.role !== this.rootRole(chat) || task.executionPolicyVersion !== 1 || !reviewerSeat?.can.acceptance || reviewer.mode !== 'verify') throw new HttpError(403, activeRoster ? '独立执行评审只能由新契约根任务委派具备验收权限的验证席位' : '独立执行评审只能由新契约根任务委派Astra verify');
         try {
           this.observePipelinePlan(chat, task);
           const issues = reviewReadinessIssues(chat, task, this.store);

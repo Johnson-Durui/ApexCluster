@@ -571,6 +571,11 @@ export async function runCursorHostTools(input: DriverInput, isolation: CursorWr
     catch (e) {
       if (input.signal.aborted) return { text: '', exitConfirmed: true, finishReason: 'cancelled' };
       if (e && typeof e === 'object' && (e as { exitConfirmed?: boolean }).exitConfirmed === false) throw driverError(e, false);
+      const feedback = safePlanFeedback(e, obj.tool);
+      if (feedback) {
+        history.push({ tool: obj.tool, error: true, text: feedback.text.slice(0, CHAT_LIMITS.toolText) });
+        continue;
+      }
       if (!(e instanceof WorkspacePathError || e instanceof ZodError)) throw driverError(e, true);
       const message = e instanceof WorkspacePathError ? e.message : '宿主工具参数不符合所提供的 schema。';
       const guidance = obj.tool === 'file_list' ? '列出根目录请使用空对象 {}，子目录使用工作区内相对路径。' : '请根据工具 schema 修正参数；原请求已拒绝。';
@@ -598,7 +603,8 @@ export function createChatDrivers(config: WorkbenchConfig, options: Options = {}
     }
     if (!reason && role === 'claude' && !validBridge(options)) reason = '聊天 MCP 桥不可用';
     if (!reason && role === 'grok' && (!cursorWriteAvailability(config.adapters.cursorWriter.capabilities).available || proof?.version !== config.adapters.cursorWriter.capabilities?.cliVersion || config.models.grok.model !== 'grok-4.7-high-fast' || config.models.grok.effort !== 'high')) reason = 'Cursor WSL 隔离、型号或强度缺少验证';
-    const capability: DriverCapability = { role, available: !reason, isolationVerified: !reason, ...(reason ? { reason } : {}), ...(proof ? { version: proof.version, fingerprint: proof.fingerprint } : {}) };
+    const provider = role === 'claude' ? 'anthropic' : role === 'grok' ? 'xai' : 'openai';
+    const capability: DriverCapability = { role, available: !reason, isolationVerified: !reason, model: config.models[role].model, effort: config.models[role].effort, provider, ...(reason ? { reason } : {}), ...(proof ? { version: proof.version, fingerprint: proof.fingerprint } : {}) };
     const driver: ChatDriver = { capability, async invoke(input) {
       try {
         if (!capability.available || !cmd || !proof) throw new ChatDriverError(capability.reason ?? '模型能力不可用', true);

@@ -237,7 +237,7 @@ export default function ChatInspector({ chat, streams, tools, rotations, capabil
             : item.id === 'tasks' ? <TasksTab chat={chat} streams={streams} tools={tools} />
             : item.id === 'files' ? <FilesTab chat={chat} />
             : item.id === 'context' ? <ContextTab chat={chat} rotations={rotations} />
-            : <SettingsSummary capabilities={capabilities} globalCapabilities={globalCapabilities} fixedDemo={fixedDemo} labels={labels} />}
+            : <SettingsSummary chat={chat} capabilities={capabilities} globalCapabilities={globalCapabilities} fixedDemo={fixedDemo} labels={labels} />}
         </section>)}
       </div>
       <InspectorFooter tasks={chat.tasks} />

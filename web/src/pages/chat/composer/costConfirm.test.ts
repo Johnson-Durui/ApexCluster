@@ -28,5 +28,6 @@ describe('cost confirmation', () => {
     expect(missingForSend({ hasContent: false, costConfirmed: false, needsCost: true, pipeline: true, workspace: false, preset: true })).toEqual(['输入内容', '额度确认', '项目目录']);
     expect(missingForSend({ hasContent: true, costConfirmed: true, needsCost: true, pipeline: false, workspace: false, preset: false })).toEqual([]);
     expect(missingForSend({ hasContent: true, costConfirmed: false, needsCost: false, pipeline: false, workspace: false, preset: false })).toEqual([]);
+    expect(missingForSend({ hasContent: true, costConfirmed: true, needsCost: true, pipeline: false, workspace: false, preset: false, teamInvalid: true })).toEqual(['自定义团队配置']);
   });
 });

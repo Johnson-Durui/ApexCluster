@@ -1,11 +1,12 @@
 // Composer state and the send path: the per-chat draft (sessionStorage), pending uploads (uploaded at send time),
 // cost confirmation, run mode for a new chat, create → upload → send, and the steering acknowledgement.
-import { useCallback, useEffect, useRef, useState, type Dispatch } from 'react';
-import { chatApi, type ChatAttachment, type ChatMessage, type ChatRecord } from '../../../lib/chat-api';
+import { useCallback, useEffect, useMemo, useRef, useState, type Dispatch } from 'react';
+import { chatApi, type ChatAttachment, type ChatMessage, type ChatRecord, type ChatTeamConfiguration } from '../../../lib/chat-api';
 import { FIXED_DEMO_PROMPT, isFixedDemoId, isFixedDemoPrompt } from '../../../lib/fixed-demo';
 import { isSteeringAcknowledgement, type ChatAction } from '../chatModel';
 import { persistCostConfirmed, readCostConfirmed, revokeCostConfirmation } from '../composer/costConfirm';
 import type { PendingUpload } from '../composer/Composer';
+import { DEFAULT_TEAM_DRAFT, parseTeamDraft, seedLeadIfEmpty, validateTeamDraft, type TeamDraft } from '../composer/teamConfig';
 import { explain } from './explain';
 
 export const MAX_ATTACHMENT_BYTES = 20 * 1024 * 1024;
@@ -28,12 +29,21 @@ async function fileBase64(file: File): Promise<string> {
   return data.slice(data.indexOf(',') + 1);
 }
 
-type Draft = { text: string; clientMessageId: string; error: string; workspaceId: string; mode: 'normal' | 'pipeline'; preset: string; auto: boolean };
+type Draft = { text: string; clientMessageId: string; error: string; workspaceId: string; mode: 'normal' | 'pipeline'; preset: string; auto: boolean; team: TeamDraft };
 function readDraft(chatId: string): Draft {
   try {
     const value = JSON.parse(sessionStorage.getItem(draftKey(chatId)) ?? '{}') as Record<string, unknown>;
-    return { text: typeof value.text === 'string' ? value.text : '', clientMessageId: typeof value.clientMessageId === 'string' ? value.clientMessageId : newId(), error: typeof value.error === 'string' ? value.error : '', workspaceId: typeof value.workspaceId === 'string' ? value.workspaceId : '', mode: value.mode === 'pipeline' ? 'pipeline' : 'normal', preset: typeof value.preset === 'string' ? value.preset : '', auto: value.auto === true };
-  } catch { return { text: '', clientMessageId: newId(), error: '', workspaceId: '', mode: 'normal', preset: '', auto: false }; }
+    return {
+      text: typeof value.text === 'string' ? value.text : '',
+      clientMessageId: typeof value.clientMessageId === 'string' ? value.clientMessageId : newId(),
+      error: typeof value.error === 'string' ? value.error : '',
+      workspaceId: typeof value.workspaceId === 'string' ? value.workspaceId : '',
+      mode: value.mode === 'pipeline' ? 'pipeline' : 'normal',
+      preset: typeof value.preset === 'string' ? value.preset : '',
+      auto: value.auto === true,
+      team: parseTeamDraft(value.team),
+    };
+  } catch { return { text: '', clientMessageId: newId(), error: '', workspaceId: '', mode: 'normal', preset: '', auto: false, team: { ...DEFAULT_TEAM_DRAFT, members: [] } }; }
 }
 function writeSession(key: string, value: string | null) {
   try { if (value === null) sessionStorage.removeItem(key); else sessionStorage.setItem(key, value); } catch { /* drafts are a convenience */ }
@@ -51,12 +61,13 @@ export interface SendOptions {
   workspaceBusy: boolean;
   demoParam: boolean;
   defaultPreset?: string;
+  teamConfiguration?: ChatTeamConfiguration | null;
   handoff: { current: string };
   startDemo(): Promise<void>;
 }
 
 export function useChatSend(options: SendOptions) {
-  const { chat, fresh, ready, dispatch, workspace } = options;
+  const { chat, fresh, ready, dispatch, workspace, teamConfiguration } = options;
   const [input, setInput] = useState('');
   const [error, setError] = useState('');
   const [draftError, setDraftError] = useState('');
@@ -66,6 +77,7 @@ export function useChatSend(options: SendOptions) {
   const [mode, setMode] = useState<'normal' | 'pipeline'>('normal');
   const [preset, setPreset] = useState('');
   const [auto, setAuto] = useState(false);
+  const [teamDraft, setTeamDraft] = useState<TeamDraft>(() => ({ ...DEFAULT_TEAM_DRAFT, members: [] }));
   const [steeringAck, setSteeringAck] = useState(false);
   const clientMessageId = useRef<string>(newId());
   const created = useRef('');
@@ -83,6 +95,7 @@ export function useChatSend(options: SendOptions) {
     if (slot === 'new') {
       if (draft.workspaceId) opts.current.setWorkspace(draft.workspaceId);
       setMode(draft.mode); setPreset(draft.preset); setAuto(draft.auto);
+      setTeamDraft(seedLeadIfEmpty(draft.team, opts.current.teamConfiguration));
     }
   }, [slot, ready]);
 
@@ -91,9 +104,28 @@ export function useChatSend(options: SendOptions) {
   }, [options.defaultPreset, preset]);
 
   useEffect(() => {
+    if (!teamConfiguration) return;
+    setTeamDraft(current => seedLeadIfEmpty(current, teamConfiguration));
+  }, [teamConfiguration]);
+
+  const teamValidation = useMemo(
+    () => (fresh || !chat) && mode === 'normal' ? validateTeamDraft(teamDraft, teamConfiguration) : { valid: true, hasReviewer: false },
+    [fresh, chat, mode, teamDraft, teamConfiguration],
+  );
+
+  useEffect(() => {
     if (!ready || !slot || (fresh && created.current)) return;
-    writeSession(draftKey(slot), JSON.stringify({ text: input, clientMessageId: clientMessageId.current, error: draftError || undefined, workspaceId: fresh ? workspace || undefined : undefined, mode: fresh ? mode : undefined, preset: fresh && mode === 'pipeline' ? preset : undefined, auto: fresh && mode === 'pipeline' ? auto : undefined }));
-  }, [slot, ready, fresh, input, draftError, workspace, mode, preset, auto]);
+    writeSession(draftKey(slot), JSON.stringify({
+      text: input,
+      clientMessageId: clientMessageId.current,
+      error: draftError || undefined,
+      workspaceId: fresh ? workspace || undefined : undefined,
+      mode: fresh ? mode : undefined,
+      preset: fresh && mode === 'pipeline' ? preset : undefined,
+      auto: fresh && mode === 'pipeline' ? auto : undefined,
+      team: fresh && teamDraft.mode === 'custom' ? teamDraft : undefined,
+    }));
+  }, [slot, ready, fresh, input, draftError, workspace, mode, preset, auto, teamDraft]);
 
   const addFiles = useCallback((files: File[]) => {
     setPending(current => {
@@ -142,6 +174,10 @@ export function useChatSend(options: SendOptions) {
     if (!costConfirmed) { setError('首次发送前，请明确确认本会话会消耗模型额度。'); return; }
     if ((fresh || !chat) && mode === 'pipeline' && !workspace) { setError('流水线需要先授权一个项目目录。'); return; }
     if ((fresh || !chat) && mode === 'pipeline' && !preset) { setError('请选择一个可用的流水线预设。'); return; }
+    if ((fresh || !chat) && mode === 'normal' && teamDraft.mode === 'custom' && !teamValidation.valid) {
+      setError(teamValidation.error || '请完善自定义协作团队配置。');
+      return;
+    }
     const requestChat = !fresh ? chat : null;
     setSteeringAck(false);
     persistCostConfirmed();
@@ -149,7 +185,12 @@ export function useChatSend(options: SendOptions) {
     let createdId = '';
     try {
       const title = text.trim().split(/\r?\n/)[0].slice(0, 40) || pending[0]?.file.name || '附件任务';
-      const target = !fresh && chat ? chat : await chatApi.create({ title, workspaceId: workspace || undefined, ...(mode === 'pipeline' ? { pipeline: { preset, auto } } : {}) });
+      const createBody = {
+        title,
+        workspaceId: workspace || undefined,
+        ...(mode === 'pipeline' ? { pipeline: { preset, auto } } : teamValidation.payload ? { team: teamValidation.payload } : {}),
+      };
+      const target = !fresh && chat ? chat : await chatApi.create(createBody);
       if (fresh || !chat) {
         createdId = target.id;
         created.current = target.id;
@@ -183,8 +224,8 @@ export function useChatSend(options: SendOptions) {
   const revokeCost = () => { revokeCostConfirmation(); setCostConfirmed(false); };
   return {
     input, setInput, error, setError, sending, setSending, pending, addFiles, retryUpload, removeUpload, send,
-    costConfirmed, confirmCost, revokeCost, mode, setMode, preset, setPreset, auto, setAuto, steeringAck,
-    resetDraft: () => { setInput(''); setPending([]); writeSession(draftKey('new'), null); clientMessageId.current = newId(); },
+    costConfirmed, confirmCost, revokeCost, mode, setMode, preset, setPreset, auto, setAuto, teamDraft, setTeamDraft, teamValidation, steeringAck,
+    resetDraft: () => { setInput(''); setPending([]); setTeamDraft({ ...DEFAULT_TEAM_DRAFT, members: [] }); writeSession(draftKey('new'), null); clientMessageId.current = newId(); },
     newMessageId: newId,
   };
 }

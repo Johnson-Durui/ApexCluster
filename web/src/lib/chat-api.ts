@@ -4,6 +4,97 @@ import { cancelFixedDemo, fixedDemoArtifactUrl, getFixedDemoSnapshot, isFixedDem
 export type ChatRole = string;
 export type TaskStatus = 'queued' | 'running' | 'waiting_user' | 'waiting_children' | 'completed' | 'failed' | 'cancelled' | 'interrupted';
 export type InvocationStatus = 'running' | 'exited' | 'exit_unknown';
+export type DelegationMode = 'proactive' | 'explicit' | 'none';
+export type TeamMemberRole = 'collaborator' | 'writer' | 'reviewer';
+
+export interface SelectableAgentOption {
+  /** API mode: exact model ID from models.registry.json; CLI mode: 'claude' | 'astra' | 'sol' | 'grok'. */
+  id: string;
+  /** Display label, e.g. 'claude-fable-5-2' (API) or 'Claude Code · claude-opus-5-5' (CLI). */
+  label: string;
+  provider: string;
+  family: string;
+  driverMode: 'api' | 'cli';
+  /** Safe auth badge without secret values, e.g. 'API Key (OPENAI_API_KEY)' or '本地订阅 CLI (Codex CLI)'. */
+  authLabel: string;
+  defaultEffort: string;
+  efforts: string[];
+  available: boolean;
+  /** Present when available === false; never silently hidden or downgraded. */
+  reason?: string;
+  model?: string;
+  contextWindow?: number;
+}
+
+export interface ChatTeamConfiguration {
+  driverMode: 'api' | 'cli';
+  supported: boolean;
+  defaultRoster: {
+    rootSeat: string;
+    leadModel?: string;
+    delegation: DelegationMode;
+    seats: Array<{ id: string; model?: string; available: boolean }>;
+  };
+  options: SelectableAgentOption[];
+}
+
+export interface ChatTeamMemberInput {
+  /** API mode: model ID; CLI mode: 'claude' | 'astra' | 'sol' | 'grok'. */
+  model: string;
+  label?: string;
+  effort?: string;
+  /** Default: 'collaborator'. */
+  role?: TeamMemberRole;
+}
+
+export interface ChatTeamInput {
+  /** Primary/Lead Agent ('主agent'): API model ID or CLI agent ID. */
+  leadModel: string;
+  leadLabel?: string;
+  leadEffort?: string;
+  /** Lead dispatch permission: 'proactive' (自主调度) | 'explicit' (按需调度) | 'none' (禁止调度). */
+  delegation: DelegationMode;
+  /** 0..16 authorized collaborators. Accepts model ID strings or ChatTeamMemberInput objects. */
+  members?: Array<string | ChatTeamMemberInput>;
+  /** Grant Lead main-workspace write & exec authority (default: false). */
+  allowLeadWrite?: boolean;
+  /** Require independent acceptance review before task completion.
+   * Omit for smart default (true iff a 'reviewer' member exists; false otherwise).
+   * Setting true without a 'reviewer' member returns HTTP 400.
+   */
+  requireAcceptanceReview?: boolean;
+}
+
+export interface FrozenChatTeamMember {
+  seatId: string;
+  model: string;
+  label: string;
+  provider: string;
+  effort: string;
+  role: TeamMemberRole;
+  canWriteMain: boolean;
+  canWriteIsolated: boolean;
+  canAccept: boolean;
+  canExec: boolean;
+}
+
+export interface FrozenChatTeam {
+  version: 1;
+  driverMode: 'api' | 'cli';
+  lead: {
+    seatId: string;
+    model: string;
+    label: string;
+    provider: string;
+    effort: string;
+    canWriteMain: boolean;
+    canExec: boolean;
+  };
+  delegation: DelegationMode;
+  members: FrozenChatTeamMember[];
+  allowLeadWrite: boolean;
+  requireAcceptanceReview: boolean;
+}
 
 export interface ChatMessage {
   id: string; seq: number; role: 'user' | 'assistant' | 'system'; text: string;
@@ -64,6 +155,7 @@ export interface ChatRecord {
   tickets: WaitTicket[]; artifacts: ChatArtifact[]; checkpoints: Checkpoint[];
   constraintMessageIds: string[]; blockedReason?: string; attachments?: ChatAttachment[]; todos?: ChatTodo[];
   pipeline?: ChatPipeline;
+  team?: FrozenChatTeam;
   fanoutGroups?: Array<{ id: string; parentTaskId: string; pool: string; total: number }>;
   apiUsage?: { tokens: number; usd: number; unpriced: number };
 }
@@ -77,7 +169,7 @@ export interface ChatPipeline {
   gates: { clarify: 'user' | 'auto'; architecture: 'user' | 'auto'; delivery: 'user' | 'auto' };
   implementation?: { error?: string; milestones: Array<{ id: string; status: string }> };
 }
-export interface ChatSummary { id: string; title: string; workspaceId?: string; updatedAt: string; status: string }
+export interface ChatSummary { id: string; title: string; workspaceId?: string; updatedAt: string; status: string; team?: FrozenChatTeam }
 export interface ChatEvent {
   seq: number; chatId: string; type: string; at: string; data: unknown;
   taskId?: string; parentTaskId?: string; invocationId?: string; turnId?: string;
@@ -91,13 +183,18 @@ export interface ApiChatConfiguration {
   mode: 'api' | 'cli';
   keyReadiness: Array<{ provider: string; env: string; configured: boolean }>;
   modelChecks: Array<{ id: string; provider: string; status: 'verified' | 'not_listed' | 'error' | 'unchecked' | 'stale' | 'simulated' }>;
-  presets: Array<{ id: string; rootSeat: string; seats: DriverCapability[]; available: boolean; reason?: string }>;
+  presets: Array<{
+    id: string; rootSeat: string; seats: DriverCapability[]; available: boolean; reason?: string;
+    scope?: 'full' | 'architecture_only';
+    architectureAvailable?: boolean;
+  }>;
 }
 export interface ChatCapabilities {
   drivers: DriverCapability[]; runner: { available: boolean; reason?: string }; nativePicker: boolean;
   dataRoot: string; unavailableReason?: string; services: ServiceCapability[];
   exec?: ExecCapability;
   apiConfiguration?: ApiChatConfiguration;
+  teamConfiguration?: ChatTeamConfiguration;
 }
 export interface ExecCapability {
   backend: 'docker' | 'wsl-bwrap' | 'windows-mxc' | 'local-unsafe' | null;
@@ -138,7 +235,7 @@ async function putSettings(body: ChatSettings): Promise<ChatSettings> {
 }
 export const chatApi = {
   list: async (signal?: AbortSignal) => [...await api.get<ChatSummary[]>('/api/chats', signal), ...listFixedDemos()].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)),
-  create: (body: { title?: string; workspaceId?: string; pipeline?: { preset: string; auto: boolean } } = {}) => api.post<ChatRecord>('/api/chats', body),
+  create: (body: { title?: string; workspaceId?: string; pipeline?: { preset: string; auto: boolean }; team?: ChatTeamInput } = {}) => api.post<ChatRecord>('/api/chats', body),
   decideGate: (id: string, gate: PipelineGateId, decision: PipelineGateAction) => api.post<ChatRecord>(`/api/chats/${id}/gates/${gate}`, decision),
   get: (id: string, signal?: AbortSignal) => isFixedDemoId(id) ? getFixedDemoSnapshot(id) : api.get<ChatSnapshot>(`/api/chats/${id}`, signal),
   capabilities: (signal?: AbortSignal) => api.get<ChatCapabilities>('/api/chat-capabilities', signal),

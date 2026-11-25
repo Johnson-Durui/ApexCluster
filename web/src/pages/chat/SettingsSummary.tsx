@@ -1,11 +1,14 @@
 // The inspector 设置 tab (BUILD-SPEC-B §4.9): a read-only summary. Global settings are edited on 环境与连接.
 // It shows the execution sandbox, per-seat availability from this chat's snapshot, and the service runtime state.
-import type { ChatCapabilities, DriverCapability } from '../../lib/chat-api';
+import type { ChatCapabilities, ChatRecord, DriverCapability } from '../../lib/chat-api';
 import { Status, Tag } from '../../components/ui';
 import ExecCapabilityNotice from './ExecCapabilityNotice';
+import { DELEGATION_LABEL, DRIVER_MODE_LABELS, MEMBER_ROLE_LABEL, memberCapabilityWords } from './composer/teamConfig';
 import { ServiceStatusList } from './settings/ServicesSection';
+import { seatStyle } from './thread/seats';
 
 export interface SettingsSummaryProps {
+  chat?: ChatRecord | null;
   capabilities: DriverCapability[];
   globalCapabilities: ChatCapabilities | null;
   fixedDemo: boolean;
@@ -13,10 +16,31 @@ export interface SettingsSummaryProps {
   labels?: Record<string, string>;
 }
 
-export default function SettingsSummary({ capabilities, globalCapabilities, fixedDemo, labels = {} }: SettingsSummaryProps) {
+export default function SettingsSummary({ chat, capabilities, globalCapabilities, fixedDemo, labels = {} }: SettingsSummaryProps) {
   const exec = globalCapabilities?.exec;
+  const team = fixedDemo ? undefined : chat?.team;
   return <section className="settings-summary" aria-label="设置摘要">
     {fixedDemo ? <p className="insp-demo-note"><Tag tone="mock">▷ 预设演示</Tag>预设演示会话：以下为本机真实全局配置</p> : null}
+    {team ? <div className="insp-sec">
+      <div className="insp-sec-title"><h3>本会话协作团队</h3><small>已冻结 · {DRIVER_MODE_LABELS[team.driverMode]}</small></div>
+      <div className="insp-team-card">
+        <div className="insp-team-lead" data-seat={team.lead.seatId} style={seatStyle(team.lead.seatId)}>
+          <span className="seat-dot" aria-hidden="true" />
+          <b>{team.lead.label}</b>
+          <Tag>主 Agent</Tag>
+          <Tag tone={team.delegation === 'none' ? undefined : 'ok'}>{DELEGATION_LABEL[team.delegation]}</Tag>
+        </div>
+        <small className="mono muted">{team.lead.model} · {team.lead.provider} · {team.lead.effort}</small>
+        <div className="insp-team-perms">
+          <span>主 Agent 写入：{team.allowLeadWrite || team.lead.canWriteMain ? '已授权' : '仅协调'}</span>
+          <span>独立验收：{team.requireAcceptanceReview ? '必需' : '不强制'}</span>
+        </div>
+        {team.members.length ? <ul className="insp-team-members">{team.members.map(member => <li key={member.seatId} data-seat={member.seatId} style={seatStyle(member.seatId)}>
+          <span className="seat-dot" aria-hidden="true" />
+          <span><b>{member.label}</b> <Tag>{MEMBER_ROLE_LABEL[member.role]}</Tag><small className="mono">{member.model} · {memberCapabilityWords(member)}</small></span>
+        </li>)}</ul> : <p className="muted">无协作者，主 Agent 独立执行。</p>}
+      </div>
+    </div> : null}
     <div className="insp-sec">
       <div className="insp-sec-title"><h3>执行沙箱</h3><small>模型命令只通过配置的执行后端运行</small></div>
       {exec?.backend ? <ExecCapabilityNotice capability={exec} />

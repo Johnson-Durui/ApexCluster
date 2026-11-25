@@ -50,7 +50,7 @@ export function SeatStrip({ model, mapCollapsed, onExpandMap }: { model: Observa
     {seats.length ? <div className="seat-chips">{seats.map(role => {
       const kind = seatKind(role);
       return <button key={role.id} type="button" className={`seat-chip btn-reset${kind === 'run' ? ' is-run' : ''}`} aria-pressed="false" style={seatStyle(role.id)} {...seatHandlers(role.id)}>
-        <span className="seat-dot" aria-hidden="true" /><span className="chip-name">{seatLabel(role.id)}</span>
+        <span className="seat-dot" aria-hidden="true" /><span className="chip-name">{role.label || seatLabel(role.id)}</span>
         <Status kind={kind} hideWord={many}>{seatWord(kind)}</Status>
         <span className="chip-line" aria-hidden="true" />
       </button>;

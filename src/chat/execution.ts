@@ -87,6 +87,7 @@ export function executionRoot(chat: ChatRecord, task: AgentTask): AgentTask | un
 }
 
 export function latchExecutionReview(chat: ChatRecord, task: AgentTask): void {
+  if (chat.team && !chat.team.requireAcceptanceReview) return;
   const root = executionRoot(chat, task) ?? (task.executionPolicyVersion === 1 && !task.parentTaskId ? task : undefined);
   if (!root || root.executionReviewRequired) return;
   const excluded = reviewerIds(chat, root);
@@ -445,7 +446,9 @@ function acceptedReviewIssues(chat: ChatRecord, root: AgentTask, reviewer: Agent
 export function submitExecutionReview(chat: ChatRecord, reviewer: AgentTask, raw: unknown, store: ChatStore, files: SessionFiles,
   authority: (task: AgentTask) => string): { accepted: boolean; duplicate?: true; code?: string; issues?: string[]; next?: string } {
   const root = executionRoot(chat, reviewer);
-  if (!root || reviewer.executionReviewOfTaskId !== root.id) throw new HttpError(403, '仅绑定的 Astra verify 评审任务可提交执行评审');
+  if (!root || reviewer.executionReviewOfTaskId !== root.id) {
+    throw new HttpError(403, chat.team ? '仅绑定的独立验收评审任务可提交执行评审' : '仅绑定的 Astra verify 评审任务可提交执行评审');
+  }
   const input = reviewSchema.parse(raw); const issues = reviewReadinessIssues(chat, root, store);
   let view: ExecutionView;
   try { view = materializeExecutionView(chat, root, store); }
@@ -491,7 +494,11 @@ export function executionCompletionIssues(chat: ChatRecord, task: AgentTask, sto
   if (attempt.viewRef !== view.viewRef || attempt.viewHash !== view.viewHash) issues.push('当前评审视图已失效');
   if (attempt.review.outcome !== 'passed') issues.push('当前执行评审未通过');
   const reviewer = attemptReviewer(chat, root, attempt);
-  if (!reviewer || !safeReviewer(chat, reviewer)) issues.push('Astra 评审任务尚未安全完成并由根任务采用');
+  if (!reviewer || !safeReviewer(chat, reviewer)) {
+    issues.push(chat.team
+      ? (reviewer ? `独立评审席位（${reviewer.role}）评审任务尚未安全完成并由根任务采用` : '独立评审任务尚未安全完成并由根任务采用')
+      : 'Astra 评审任务尚未安全完成并由根任务采用');
+  }
   if (reviewer) {
     const accepted = acceptedReviewIssues(chat, root, reviewer, view, attempt.review, store, files, authority);
     issues.push(...accepted.issues);

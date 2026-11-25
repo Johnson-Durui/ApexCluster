@@ -100,6 +100,14 @@
 .chat-inspector .settings-summary{display:grid;gap:18px;min-width:0}
 .chat-inspector .insp-demo-note{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 10px;border:1px dashed var(--mock-line);border-radius:var(--r2);background:var(--mock-bg);color:var(--mock-ink);font-size:var(--fs-dense)}
 .chat-inspector .settings-summary .exec-capability{margin:0}
+.chat-inspector .insp-team-card{display:grid;gap:6px;padding:8px 10px;border:1px solid var(--line);border-radius:var(--r2);background:var(--surface-2)}
+.chat-inspector .insp-team-lead{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.chat-inspector .insp-team-lead b{font-size:var(--fs-dense);font-weight:600}
+.chat-inspector .insp-team-perms{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:var(--fs-meta);color:var(--ink-2)}
+.chat-inspector .insp-team-members{display:grid;gap:6px;margin:2px 0 0;padding:6px 0 0;border-top:1px solid var(--line);list-style:none}
+.chat-inspector .insp-team-members li{display:grid;grid-template-columns:8px minmax(0,1fr);align-items:baseline;gap:8px;font-size:var(--fs-dense)}
+.chat-inspector .insp-team-members li>span:last-child{display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;min-width:0}
+.chat-inspector .insp-team-members small{flex:1 1 100%;color:var(--muted);font-size:var(--fs-meta)}
 .chat-inspector .insp-seat-list,.chat-inspector .settings-summary .service-status-list{display:grid;margin:0;padding:0;list-style:none}
 .chat-inspector .insp-seat-list li{display:grid;grid-template-columns:8px minmax(0,1fr) auto;align-items:center;gap:2px 8px;padding:7px 0;border-top:1px solid var(--line)}
 .chat-inspector .insp-seat-list li:first-child{border-top:0}

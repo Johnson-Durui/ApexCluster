@@ -141,10 +141,13 @@ export function buildObservatory(chat: ChatRecord | null, capabilities: DriverCa
   const tasks = chat?.tasks.filter(task => task.turnId === turnId) ?? [];
   const taskById = new Map(tasks.map(task => [task.id, task]));
   const root = latestTurn ? taskById.get(latestTurn.rootTaskId) : tasks.findLast(task => !task.parentTaskId);
-  const rootRole = root?.role;
+  const team = fixedDemo ? undefined : chat?.team;
+  const teamMembers = new Map((team?.members ?? []).map(member => [member.seatId, member]));
+  const rootRole = root?.role ?? team?.lead.seatId;
   const capabilityByRole = new Map((fixedDemo ? [] : capabilities).map(seat => [seat.role, seat]));
   const seatOrder = new Set([
     ...(rootRole ? [rootRole] : []),
+    ...(team ? [team.lead.seatId, ...team.members.map(member => member.seatId)] : []),
     ...capabilityByRole.keys(),
     ...tasks.map(task => task.role),
   ]);
@@ -173,15 +176,27 @@ export function buildObservatory(chat: ChatRecord | null, capabilities: DriverCa
     ...(chat?.tickets ?? []).filter(ticket => ticket.type === 'user' && ticket.status === 'pending' && taskById.has(ticket.taskId)).map(ticket => ticket.taskId),
   ]);
   const roles: ObservatoryRole[] = Array.from(seatOrder, id => {
-    const [label, description] = seatDetails.get(id) ?? [id, '协作席位'];
+    const customLead = team && team.lead.seatId === id ? team.lead : undefined;
+    const customMember = teamMembers.get(id);
+    const customLabel = customLead?.label ?? customMember?.label;
+    const customDesc = customLead
+      ? (team?.delegation === 'none' ? '主 Agent · 独立执行' : team?.delegation === 'explicit' ? '主 Agent · 按需调度' : '主 Agent · 自主调度')
+      : customMember
+        ? (customMember.role === 'reviewer' ? '独立评审与验收' : customMember.role === 'writer' ? '实现写入与执行' : '可调度协作者')
+        : undefined;
+    const [defaultLabel, defaultDesc] = seatDetails.get(id) ?? [id, '协作席位'];
+    const label = customLabel ?? defaultLabel;
+    const description = customDesc ?? defaultDesc;
     const roleTasks = tasksByRole.get(id) ?? [];
     const states = roleTasks.map(task => taskStatus[task.status].state);
     const state = (['active', 'hold', 'error', 'stopped', 'done'] as const).find(item => states.includes(item)) ?? 'idle';
     const latestInvocation = latestInvocationByRole.get(id);
     const capability = capabilityByRole.get(id);
-    const effort = readEffort(latestInvocation?.effort, 'recorded') ?? readEffort(capability?.effort, 'configured');
-    const model = latestInvocation?.model ?? capability?.model;
-    const modelSource = latestInvocation?.model ? 'recorded' as const : capability?.model ? 'configured' as const : undefined;
+    const configuredEffort = capability?.effort ?? customLead?.effort ?? customMember?.effort;
+    const configuredModel = capability?.model ?? customLead?.model ?? customMember?.model;
+    const effort = readEffort(latestInvocation?.effort, 'recorded') ?? readEffort(configuredEffort, 'configured');
+    const model = latestInvocation?.model ?? configuredModel;
+    const modelSource = latestInvocation?.model ? 'recorded' as const : configuredModel ? 'configured' as const : undefined;
     return { id, label, description, state, tasks: roleTasks, latestInvocation, effort, model, modelSource, available: capability?.available,
       waitsOnUser: roleTasks.some(task => userWaitIds.has(task.id)) };
   });

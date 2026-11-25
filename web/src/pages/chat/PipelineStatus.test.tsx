@@ -24,6 +24,20 @@ describe('pipeline chat controls', () => {
     expect(html).not.toContain('ScriptedProvider');
   });
 
+  it('allows selecting an architecture-only preset with a clear Gate-A notice when its provider is verified', () => {
+    const html = renderToStaticMarkup(<PipelineComposerControls mode="pipeline" preset="single-provider" auto={false} disabled={false} workspaceGranted
+      configuration={{
+        mode: 'api', keyReadiness: [], modelChecks: [], presets: [
+          { id: 'single-provider', rootSeat: 'claude', seats: [], available: false, scope: 'architecture_only', architectureAvailable: true, reason: '完整流水线需要 Sol 与 Opus 来自不同厂商家族' },
+          { id: 'offline', rootSeat: 'claude', seats: [], available: false, reason: '缺少密钥' },
+        ],
+      }}
+      onMode={vi.fn()} onPreset={vi.fn()} onAuto={vi.fn()} />);
+    expect(html).toContain('<option value="single-provider" selected="">single-provider（仅架构阶段 · 至关卡 A）</option>');
+    expect(html).toContain('仅架构阶段可用（至关卡 A）：完整流水线需要 Sol 与 Opus 来自不同厂商家族');
+    expect(html).toContain('<option value="offline" disabled="">offline（缺少密钥）</option>');
+  });
+
   // Split from the original single render (BUILD-SPEC-B §8.1): PipelineStatus is now the read-only inspector summary and
   // the decisions live in GateCard. Every original assertion string is still asserted below.
   it('shows stage, usage, rotations and all Gate A decisions', () => {

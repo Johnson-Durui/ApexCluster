@@ -198,3 +198,26 @@ describe('stopped work', () => {
     expect(running.pipeline.stages[0]?.state).toBe('active');
   });
 });
+
+describe('custom frozen team projection', () => {
+  it('uses custom team labels, models and rootSeat when chat.team is frozen', () => {
+    const result = buildObservatory(chat({
+      team: {
+        version: 1,
+        driverMode: 'api',
+        lead: { seatId: 'lead-deepseek', model: 'deepseek-v4-pro', label: 'DeepSeek Lead', provider: 'deepseek', effort: 'high', canWriteMain: true, canExec: true },
+        delegation: 'proactive',
+        members: [{ seatId: 'helper-gpt', model: 'gpt-6.2-astra', label: 'GPT Helper', provider: 'openai', effort: 'max', role: 'reviewer', canWriteMain: false, canWriteIsolated: false, canAccept: true, canExec: true }],
+        allowLeadWrite: true,
+        requireAcceptanceReview: true,
+      },
+    }), [], [], [], false);
+    expect(result.rootRole).toBe('lead-deepseek');
+    expect(result.roles.map(role => [role.id, role.label, role.model])).toEqual([
+      ['lead-deepseek', 'DeepSeek Lead', 'deepseek-v4-pro'],
+      ['helper-gpt', 'GPT Helper', 'gpt-6.2-astra'],
+    ]);
+    expect(result.roles[0]?.description).toContain('主 Agent');
+    expect(result.roles[1]?.description).toContain('独立评审');
+  });
+});

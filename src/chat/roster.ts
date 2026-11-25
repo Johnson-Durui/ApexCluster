@@ -175,19 +175,25 @@ export const CLI_ROSTER: Roster = {
   layers: { architecture: { pools: [] }, implementation: { pools: [] } },
 };
 
+/** Resolve the active roster for a chat, keeping API, custom CLI, and legacy CLI rosters distinct. */
+export function chatRoster(chat: ChatRecord): Roster {
+  return chat.apiRoster?.roster ?? chat.cliRoster ?? CLI_ROSTER;
+}
+
 /** Resolve a task against its recorded policy; old records always use CLI policy. */
 export function taskSeat(chat: ChatRecord, task: AgentTask): ResolvedSeat | undefined {
-  if (!chat.apiRoster) return resolveSeat(CLI_ROSTER, task.role, task.phase);
-  return resolveSeat(chat.apiRoster.roster, task.role, task.phase)
-    ?? resolvePool(chat.apiRoster.roster, task.role, task.phase, task.poolProvider);
+  if (chat.apiRoster) {
+    return resolveSeat(chat.apiRoster.roster, task.role, task.phase)
+      ?? resolvePool(chat.apiRoster.roster, task.role, task.phase, task.poolProvider);
+  }
+  return resolveSeat(chat.cliRoster ?? CLI_ROSTER, task.role, task.phase);
 }
 
 function poolBindings(pool: PoolSpec): ModelBinding[] {
   return 'byParentProvider' in pool.binding ? Object.values(pool.binding.byParentProvider) : [pool.binding];
 }
 
-/** Parse the roster, validating every declared binding and phase permission before startup. */
-export function parseRoster(input: unknown, registry: ReadonlyMap<string, ModelSpec>): Roster {
+function validateRosterStructure(input: unknown): Roster {
   const parsed = rosterSchema.safeParse(input);
   if (!parsed.success) throw new Error(`名册结构无效：${parsed.error.issues.map(issue => issue.path.join('.') || 'roster').join(', ')}`);
   const roster = parsed.data;
@@ -206,7 +212,6 @@ export function parseRoster(input: unknown, registry: ReadonlyMap<string, ModelS
   for (const phase of [undefined, ...phaseSchema.options]) {
     const resolved = roster.seats.map(seat => resolveSeat(roster, seat.id, phase)!);
     for (const seat of resolved) {
-      requireModel(registry, seat.binding.model, seat.binding.effort);
       if (seat.can.writeMain) mainWriters.add(seat.id);
       if (seat.can.delegateSeats.some(id => id === seat.id || !seats.has(id))) throw new Error(`席位 ${seat.id} 的委派目标无效`);
       if (seat.can.integrate && !seat.can.writeMain) throw new Error(`席位 ${seat.id} 缺少集成所需的主工作区写权限`);
@@ -221,8 +226,29 @@ export function parseRoster(input: unknown, registry: ReadonlyMap<string, ModelS
     const bindings = poolBindings(pool);
     if (bindings.length === 0) throw new Error(`池 ${pool.id} 缺少绑定`);
     for (const entry of bindings) {
-      requireModel(registry, entry.model, entry.effort);
       if (entry.delegation !== 'none') throw new Error(`池 ${pool.id} 的 worker 不可再委派`);
+    }
+  }
+  return roster;
+}
+
+/** Validate a custom CLI roster's permission/weight invariants without requiring an API model registry. */
+export function validateCliRoster(input: unknown): Roster {
+  return validateRosterStructure(input);
+}
+
+/** Parse the roster, validating every declared binding and phase permission before startup. */
+export function parseRoster(input: unknown, registry: ReadonlyMap<string, ModelSpec>): Roster {
+  const roster = validateRosterStructure(input);
+  for (const phase of [undefined, ...phaseSchema.options]) {
+    const resolved = roster.seats.map(seat => resolveSeat(roster, seat.id, phase)!);
+    for (const seat of resolved) {
+      requireModel(registry, seat.binding.model, seat.binding.effort);
+    }
+  }
+  for (const pool of roster.pools) {
+    for (const entry of poolBindings(pool)) {
+      requireModel(registry, entry.model, entry.effort);
     }
   }
   return roster;

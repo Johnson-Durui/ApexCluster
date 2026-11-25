@@ -36,6 +36,7 @@ export interface ComposerProps {
   onCostRevoke(): void;
   steeringAck: boolean;
   pipeline: { mode: 'normal' | 'pipeline'; workspace: boolean; preset: boolean };
+  team?: { custom: boolean; invalid: boolean; reason?: string };
   runMode: ReactNode;
   project: ReactNode;
   collab: ReactNode;
@@ -44,18 +45,19 @@ export interface ComposerProps {
 const uploadWords = (item: PendingUpload) => item.status === 'queued' ? '等待上传' : item.status === 'uploading' ? '上传中…' : item.status === 'uploaded' ? '已上传，等待发送' : item.error ?? '上传失败';
 
 export function Composer(props: ComposerProps) {
-  const { input, sending, workspaceBusy, canStop, pending, fresh, pipeline } = props;
+  const { input, sending, workspaceBusy, canStop, pending, fresh, pipeline, team } = props;
   const unavailable = Boolean(props.unavailable);
   const [dragging, setDragging] = useState(false);
   const [fileInput, setFileInput] = useState<HTMLInputElement | null>(null);
   const hasContent = Boolean(input.trim()) || pending.length > 0;
   const pipelineBlocked = fresh && pipeline.mode === 'pipeline' && (!pipeline.workspace || !pipeline.preset);
-  const disabled = unavailable || sending || workspaceBusy || !hasContent || pipelineBlocked;
+  const teamBlocked = fresh && pipeline.mode === 'normal' && Boolean(team?.custom && team.invalid);
+  const disabled = unavailable || sending || workspaceBusy || !hasContent || pipelineBlocked || teamBlocked;
   const reason = props.unavailable === 'loading' ? '正在恢复聊天' : unavailable ? '无法发送：聊天未加载' : sending ? '发送中' : !hasContent ? '请先输入内容或添加附件'
-    : fresh && pipeline.mode === 'pipeline' && !pipeline.workspace ? '流水线需要项目目录' : pipelineBlocked ? '请选择一个可用的流水线预设' : canStop ? '追加消息' : '发送';
+    : fresh && pipeline.mode === 'pipeline' && !pipeline.workspace ? '流水线需要项目目录' : pipelineBlocked ? '请选择一个可用的流水线预设' : teamBlocked ? (team?.reason || '请完善自定义团队配置') : canStop ? '追加消息' : '发送';
   const demo = props.fixedDemo || props.demoInput;
-  const missing = missingForSend({ hasContent, costConfirmed: props.costConfirmed, needsCost: !demo, pipeline: fresh && pipeline.mode === 'pipeline', workspace: pipeline.workspace, preset: pipeline.preset });
-  const showMissing = !unavailable && missing.length > 0 && (hasContent || (fresh && pipeline.mode === 'pipeline'));
+  const missing = missingForSend({ hasContent, costConfirmed: props.costConfirmed, needsCost: !demo, pipeline: fresh && pipeline.mode === 'pipeline', workspace: pipeline.workspace, preset: pipeline.preset, teamInvalid: teamBlocked });
+  const showMissing = !unavailable && missing.length > 0 && (hasContent || (fresh && pipeline.mode === 'pipeline') || teamBlocked);
 
   return <div className="composer-dock">
     {props.error ? <p className="chat-error compose-error" role="alert">{props.error}</p> : null}

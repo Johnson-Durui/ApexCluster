@@ -2,6 +2,11 @@
 // one-row segmented control above the textarea by composer.css.
 import type { ApiChatConfiguration } from '../../../lib/chat-api';
 
+type PresetItem = ApiChatConfiguration['presets'][number];
+
+export const isPresetSelectable = (item: PresetItem): boolean => item.available || item.architectureAvailable === true;
+export const isArchitectureOnlyPreset = (item: PresetItem): boolean => !item.available && item.architectureAvailable === true;
+
 export function PipelineComposerControls({ configuration, mode, preset, auto, disabled, workspaceGranted, onMode, onPreset, onAuto }: {
   configuration?: ApiChatConfiguration;
   mode: 'normal' | 'pipeline';
@@ -14,6 +19,8 @@ export function PipelineComposerControls({ configuration, mode, preset, auto, di
   onAuto: (auto: boolean) => void;
 }) {
   const presets = configuration?.presets ?? [];
+  const selected = presets.find(item => item.id === preset);
+  const archOnlyNotice = selected && isArchitectureOnlyPreset(selected);
   return <fieldset className="pipeline-create" disabled={disabled}>
     <legend>运行方式</legend>
     <div className="pipeline-mode" role="radiogroup" aria-label="新聊天运行方式">
@@ -23,9 +30,12 @@ export function PipelineComposerControls({ configuration, mode, preset, auto, di
     {mode === 'pipeline' ? <div className="pipeline-create-options">
       <label><span>流水线预设</span><select value={preset} onChange={event => onPreset(event.target.value)}>
         <option value="">选择预设</option>
-        {presets.map(item => <option key={item.id} value={item.id} disabled={!item.available}>{item.id}{item.available ? '' : `（${item.reason ?? '不可用'}）`}</option>)}
+        {presets.map(item => <option key={item.id} value={item.id} disabled={!isPresetSelectable(item)}>
+          {item.id}{item.available ? '' : item.architectureAvailable ? '（仅架构阶段 · 至关卡 A）' : `（${item.reason ?? '不可用'}）`}
+        </option>)}
       </select></label>
       <label className="pipeline-auto"><input type="checkbox" checked={auto} onChange={event => onAuto(event.target.checked)} />自动通过用户关卡</label>
+      {archOnlyNotice ? <p className="pipeline-arch-notice" role="status">仅架构阶段可用（至关卡 A）：{selected.reason ?? '完整实现阶段需要不同厂商家族席位。'}</p> : null}
       {!workspaceGranted ? <p className="pipeline-workspace-required"><b aria-hidden="true">! </b>流水线需要先授权项目目录</p> : null}
     </div> : null}
   </fieldset>;

@@ -5,7 +5,8 @@ import type { ApiBudget } from './api-run-settings.js';
 import type { FanoutGroup } from './fanout.js';
 import type { TaskExecJob } from '../exec/types.js';
 import type { PipelineState } from '../pipeline/state.js';
-import type { FrozenApiRoster, PhaseId } from './roster.js';
+import type { FrozenApiRoster, PhaseId, Roster } from './roster.js';
+import type { FrozenChatTeam } from './team.js';
 export type CliChatRole = 'claude' | 'astra' | 'sol' | 'grok';
 /** An API seat ID or one of the four established CLI roles. */
 export type ChatRole = string;
@@ -167,6 +168,10 @@ export interface ChatRecord {
   version: 1; id: string; title: string; createdAt: string; updatedAt: string;
   /** For API chats only. Older CLI chat records have no roster snapshot. */
   apiRoster?: FrozenApiRoster;
+  /** For custom-team CLI chats only. Kept separate from apiRoster so CLI persistence/driver checks stay distinct. */
+  cliRoster?: Roster;
+  /** Frozen summary of a user-configured per-task custom multi-agent team (API or CLI mode). */
+  team?: FrozenChatTeam;
   fanoutGroups?: FanoutGroup[];
   apiBudget?: ApiBudget;
   apiUsage?: { tokens: number; usd: number; unpriced: number };

@@ -18,13 +18,14 @@ export function revokeCostConfirmation(storage: Store | undefined = session()) {
 }
 
 /** What still blocks sending, in the order the user meets it (only missing items). */
-export function missingForSend({ hasContent, costConfirmed, needsCost, pipeline, workspace, preset }: {
-  hasContent: boolean; costConfirmed: boolean; needsCost: boolean; pipeline: boolean; workspace: boolean; preset: boolean;
+export function missingForSend({ hasContent, costConfirmed, needsCost, pipeline, workspace, preset, teamInvalid = false }: {
+  hasContent: boolean; costConfirmed: boolean; needsCost: boolean; pipeline: boolean; workspace: boolean; preset: boolean; teamInvalid?: boolean;
 }): string[] {
   const missing: string[] = [];
   if (!hasContent) missing.push('输入内容');
   if (needsCost && !costConfirmed) missing.push('额度确认');
   if (pipeline && !workspace) missing.push('项目目录');
   if (pipeline && !preset) missing.push('流水线预设');
+  if (!pipeline && teamInvalid) missing.push('自定义团队配置');
   return missing;
 }

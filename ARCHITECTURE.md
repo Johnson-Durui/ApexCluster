@@ -4,8 +4,8 @@ Multi-Agent Workbench has one durable chat runtime and two pipeline layers. It d
 
 ## Main components
 
-- `src/providers/` normalizes Anthropic Messages, OpenAI Responses-compatible APIs, and Google GenAI events into text, reasoning summaries, tool calls, usage, and terminal reasons. `ScriptedProvider` drives offline tests.
-- `src/chat/` owns conversations, turns, tasks, invocations, windows, tickets, event persistence, roster permissions, workspace grants, and tools. API and legacy CLI drivers are distinct.
+- `src/providers/` normalizes Anthropic Messages, OpenAI Responses-compatible APIs (including custom/local OpenAI-compatible endpoints via `models.registry.local.json`), and Google GenAI events into text, reasoning summaries, tool calls, usage, and terminal reasons. `ScriptedProvider` drives offline tests.
+- `src/chat/` owns conversations, turns, tasks, invocations, windows, tickets, event persistence, roster permissions, per-chat frozen custom teams (`FrozenChatTeam`, with `apiRoster` and `cliRoster` kept strictly separate), workspace grants, and tools. Any verified API model or qualified local CLI seat (`claude`, `astra`, `sol`, `grok`) can be designated per chat as `rootSeat` with explicit dispatch authority (`proactive` / `explicit` / `none`) and member roles (`collaborator` / `writer` / `reviewer`), enforced fail-closed by `WorkspaceGateway` and `delegationWeight`. API and local CLI drivers remain distinct.
 - `src/pipeline/` owns architecture clustering, gates, requirement/acceptance contracts, implementation plans, cross-review, integration, acceptance, and TRACE.
 - `src/exec/` runs commands through a selected backend. Docker is the portable default; WSL bwrap and Windows MXC require local capability proof. `local-unsafe` is explicit and unsuitable for independent acceptance.
 - `src/server/` exposes the local API. `web/` renders the workbench without receiving secret values.
@@ -32,7 +32,7 @@ Events are append-oriented and materialized into chat state. Recovery resumes on
 
 ## Trust boundaries
 
-1. API keys are read from named environment variables by provider adapters. Values do not enter configuration, events, prompts, the browser API, CLI child processes, or execution containers.
+1. API keys are read from named environment variables by provider adapters. Values do not enter configuration, events, prompts, the browser API, CLI child processes, or execution containers. Local-subscription CLI adapters also explicitly scrub `ANTHROPIC_API_KEY`, `ANTHROPIC_AUTH_TOKEN`, `OPENAI_API_KEY`, `CODEX_API_KEY`, `CURSOR_API_KEY`, and all `*_API_KEY` variables before spawning child processes so subscription invocations cannot accidentally trigger paid API billing.
 2. A workspace must be granted from a local native directory selection request. Paths are normalized and constrained to that grant.
 3. Model-generated commands are structured argument arrays. The default Docker backend mounts only the work copy, runs as a non-root user, limits resources, and disables network for normal commands. Installation network access is a separate configured capability.
 4. The execution image is configured by immutable local digest. The runtime does not pull, retag, or substitute an image.
